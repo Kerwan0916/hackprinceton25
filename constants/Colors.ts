@@ -19,14 +19,6 @@ export const white = '#FFFFFF';
 export const offWhite = '#F8F9FA';
 export const lightGray = '#EFEFEF';
 
-// App specific colors
-export const primaryBlue = '#2473B3';
-export const primaryTeal = '#00ABC0';
-export const darkBlue = '#0E2A47';
-export const lightBlue = '#E0F3F9';
-export const white = '#FFFFFF';
-export const offWhite = '#F9FBFC';
-
 export const Colors = {
   light: {
     text: darkBlue,
