@@ -1,74 +1,141 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Image, StyleSheet, Platform, View, ScrollView, Pressable, Text } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { Colors } from '../../constants/Colors';
+
 export default function HomeScreen() {
+  const userName = "Name"; // This would come from user profile in a real app
+  
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.welcomeText}>Welcome back,</Text>
+          <Text style={styles.nameText}>{userName}!</Text>
+        </View>
+        <View style={styles.avatarContainer}>
+          <Ionicons name="person" size={40} color="#2473B3" />
+        </View>
+      </View>
+      
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+        <Pressable style={styles.card}>
+          <View style={[styles.iconContainer, { backgroundColor: '#2473B3' }]}>
+            <Ionicons name="checkmark" size={24} color="white" />
+          </View>
+          <Text style={styles.cardTitle}>Daily Check-in</Text>
+        </Pressable>
+        
+        <Pressable style={styles.card}>
+          <View style={[styles.iconContainer, { backgroundColor: '#2473B3' }]}>
+            <FontAwesome5 name="prescription-bottle-alt" size={24} color="white" />
+          </View>
+          <View style={styles.medicationContent}>
+            <Text style={styles.cardTitle}>Medications & Schedule</Text>
+            <Text style={styles.reminderText}>Next reminder at 2:00 PM</Text>
+          </View>
+        </Pressable>
+        
+        <Pressable style={[styles.card, styles.medicalInfoCard]}>
+          <View style={[styles.iconContainer, { backgroundColor: '#2473B3' }]}>
+            <FontAwesome5 name="heart" size={24} color="white" />
+          </View>
+          <Text style={styles.cardTitle}>Medical Information</Text>
+        </Pressable>
+        
+        <Pressable style={[styles.card, styles.askQuestionCard]}>
+          <View style={[styles.iconContainer, { backgroundColor: '#2473B3' }]}>
+            <Ionicons name="chatbubble-ellipses-outline" size={24} color="white" />
+          </View>
+          <Text style={styles.cardTitle}>Ask a Question</Text>
+        </Pressable>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: 60,
+    backgroundColor: '#2473B3',
+  },
+  welcomeText: {
+    fontSize: 26,
+    color: 'white',
+  },
+  nameText: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  avatarContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  card: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E0F3F9',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  iconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#0E2A47',
+  },
+  medicationContent: {
+    flex: 1,
+  },
+  reminderText: {
+    fontSize: 14,
+    color: '#2473B3',
+    marginTop: 5,
+  },
+  medicalInfoCard: {
+    backgroundColor: '#E0F3F9',
+  },
+  askQuestionCard: {
+    backgroundColor: 'white',
   },
 });
