@@ -17,7 +17,11 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
           
-          <Pressable style={styles.settingItem}>
+          <Pressable 
+            style={({ hovered }) => [
+              styles.settingItem,
+              hovered && styles.pressableActive
+            ]}>
             <View style={styles.settingLeft}>
               <View style={styles.iconContainer}>
                 <Ionicons name="person" size={20} color="#2473B3" />
@@ -27,7 +31,11 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
           </Pressable>
           
-          <Pressable style={styles.settingItem}>
+          <Pressable 
+            style={({ hovered }) => [
+              styles.settingItem,
+              hovered && styles.pressableActive
+            ]}>
             <View style={styles.settingLeft}>
               <View style={styles.iconContainer}>
                 <Ionicons name="medical" size={20} color="#2473B3" />
@@ -90,7 +98,11 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Support</Text>
           
-          <Pressable style={styles.settingItem}>
+          <Pressable 
+            style={({ hovered }) => [
+              styles.settingItem,
+              hovered && styles.pressableActive
+            ]}>
             <View style={styles.settingLeft}>
               <View style={styles.iconContainer}>
                 <Ionicons name="help-circle" size={20} color="#2473B3" />
@@ -100,7 +112,11 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
           </Pressable>
           
-          <Pressable style={styles.settingItem}>
+          <Pressable 
+            style={({ hovered }) => [
+              styles.settingItem,
+              hovered && styles.pressableActive
+            ]}>
             <View style={styles.settingLeft}>
               <View style={styles.iconContainer}>
                 <Ionicons name="shield-checkmark" size={20} color="#2473B3" />
@@ -110,7 +126,12 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
           </Pressable>
           
-          <Pressable style={[styles.settingItem, styles.logoutItem]}>
+          <Pressable 
+            style={({ hovered }) => [
+              styles.settingItem, 
+              styles.logoutItem,
+              hovered && styles.pressableActive
+            ]}>
             <Text style={styles.logoutText}>Log Out</Text>
           </Pressable>
         </View>
@@ -130,6 +151,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     paddingHorizontal: 20,
     alignItems: 'center',
+  },
+  pressableActive: {
+    backgroundColor: 'gray',
   },
   title: {
     color: 'white',

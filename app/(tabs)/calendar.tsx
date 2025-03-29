@@ -1,4 +1,5 @@
 import { Image, StyleSheet, Platform, View, ScrollView, Pressable, Text } from 'react-native';
+import React, { useState } from 'react';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -9,65 +10,125 @@ import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 import { hoverGestureHandlerProps } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/hoverGesture';
 
+function Calendar(){
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [events, setEvents] = useState<Array<{date: string; title: string; time: string}>>([
+    { date: new Date().toISOString().split('T')[0], title: 'Take Medication', time: '9:00 AM' },
+    { date: new Date().toISOString().split('T')[0], title: 'Doctor Appointment', time: '2:30 PM' },
+    { date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0], title: 'Lab Test', time: '10:00 AM' },
+  ]);
+
+  const addEvent = (title: string, date: Date, time: string) => {
+    const dateString = date.toISOString().split('T')[0];
+    setEvents([...events, { date: dateString, title, time }]);
+  };
+
+  const goToPreviousMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+  };
+
+  const goToNextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)); 
+  };
+
+  const selectDate = (date: Date) => {
+    setSelectedDate(date);
+  };
+
+  const renderCalendarHeader = () => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return (
+      <View style={styles.calendarHeader}>
+        {days.map(day => (
+          <Text key={day} style={styles.dayHeader}>{day}</Text>
+        ))}
+      </View>
+    );
+  };
+
+  const renderCalendarDays = () => {
+    const firstDayOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+    const startingDay = firstDayOfMonth.getDay();
+    const daysInMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
+    
+    const days = [];
+    for (let i = 0; i < startingDay; i++) {
+      days.push(<View key={`empty-${i}`} style={styles.calendarDay} />);
+    }
+    
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), i);
+      const dateString = date.toISOString().split('T')[0];
+      const hasEvents = events.some(event => event.date === dateString);
+      
+      days.push(
+        <Pressable 
+          key={i}
+          onPress={() => selectDate(date)}
+          style={({hovered}) => [
+            styles.calendarDay,
+            date.getDate() === selectedDate.getDate() && styles.selectedDay,
+            hovered && styles.hoveredDay
+          ]}>
+          <Text style={[
+            styles.calendarDayText,
+            date.getDate() === selectedDate.getDate() && styles.selectedDayText
+          ]}>{i}</Text>
+          {hasEvents && <View style={styles.eventDot} />}
+        </Pressable>
+      );
+    }
+
+    return <View style={styles.calendarGrid}>{days}</View>;
+  };
+
+  return (
+    <View style={styles.calendarContainer}>
+      <View style={styles.monthSelector}>
+        <Pressable onPress={() => setSelectedDate(new Date(selectedDate.setMonth(selectedDate.getMonth() - 1)))}>
+          <Ionicons name="chevron-back" size={24} color="#2473B3" />
+        </Pressable>
+        <Text style={styles.monthText}>
+          {selectedDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+        </Text>
+        <Pressable onPress={() => setSelectedDate(new Date(selectedDate.setMonth(selectedDate.getMonth() + 1)))}>
+          <Ionicons name="chevron-forward" size={24} color="#2473B3" />
+        </Pressable>
+      </View>
+
+      {renderCalendarHeader()}
+      {renderCalendarDays()}
+
+      <View style={styles.eventsContainer}>
+        <Text style={styles.eventsTitle}>Events</Text>
+        {events.map((event, index) => (
+          <View key={index} style={styles.eventItem}>
+            <View style={styles.eventTimeContainer}>
+              <Ionicons name="time" size={20} color="#2473B3" />
+              <Text style={styles.eventTime}>{event.time}</Text>
+            </View>
+            <Text style={styles.eventTitle}>{event.title}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
 export default function HomeScreen() {
-  const userName = "Name"; // This would come from user profile in a real app
-  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
           <Text style={styles.welcomeText}>Welcome back,</Text>
-          <Text style={styles.nameText}>{userName}!</Text>
+          <Text style={styles.nameText}>User!</Text>
         </View>
         <View style={styles.avatarContainer}>
           <Ionicons name="person" size={40} color="#2473B3" />
         </View>
       </View>
-      
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
-        <Pressable style={({hovered}) => [
-          styles.card,
-          {backgroundColor: hovered ? 'gray' : 'white'},
-        ]}>
-          <View style={[styles.iconContainer, { backgroundColor: '#2473B3' }]}>
-            <Ionicons name="checkmark" size={24} color="white" />
-          </View>
-          <Text style={styles.cardTitle}>Daily Check-in</Text>
-        </Pressable>
-        
-        <Pressable style={({hovered}) => [
-          styles.card,
-          {backgroundColor: hovered ? 'gray' : 'white'},
-        ]}>
-          <View style={[styles.iconContainer, { backgroundColor: '#2473B3' }]}>
-            <FontAwesome5 name="prescription-bottle-alt" size={24} color="white" />
-          </View>
-          <View style={styles.medicationContent}>
-            <Text style={styles.cardTitle}>Medications & Schedule</Text>
-            <Text style={styles.reminderText}>Next reminder at 2:00 PM</Text>
-          </View>
-        </Pressable>
-        
-        <Pressable style={({hovered}) => [
-          styles.card,
-          {backgroundColor: hovered ? 'gray' : 'white'},
-        ]}>          
-        <View style={[styles.iconContainer, { backgroundColor: '#2473B3' }]}>
-            <FontAwesome5 name="heart" size={24} color="white" />
-          </View>
-          <Text style={styles.cardTitle}>Medical Information</Text>
-        </Pressable>
-        
-        <Pressable style={({hovered}) => [
-          styles.card,
-          {backgroundColor: hovered ? 'gray' : 'white'},
-        ]}>          
-        <View style={[styles.iconContainer, { backgroundColor: '#2473B3' }]}>
-            <Ionicons name="chatbubble-ellipses-outline" size={24} color="white" />
-          </View>
-          <Text style={styles.cardTitle}>Ask a Question</Text>
-        </Pressable>
-      </ScrollView>
+      <Calendar />
     </View>
   );
 }
@@ -150,5 +211,96 @@ const styles = StyleSheet.create({
   },
   askQuestionCard: {
     backgroundColor: 'white',
+  },
+  calendarContainer: {
+    padding: 16,
+    backgroundColor: 'white',
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 10,
+  },
+  dayHeader: {
+    width: 40,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: '#555',
+  },
+  monthSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  monthText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2473B3',
+  },
+  calendarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 20,
+  },
+  calendarDay: {
+    width: '14.28%',
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  calendarDayText: {
+    textAlign: 'center',
+  },
+  selectedDay: {
+    backgroundColor: '#E0F3F9',
+    borderRadius: 20,
+  },
+  selectedDayText: {
+    color: '#2473B3',
+    fontWeight: 'bold',
+  },
+  hoveredDay: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: 20,
+  },
+  eventDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#FF6B6B',
+    position: 'absolute',
+    bottom: 5,
+  },
+  eventsContainer: {
+    marginTop: 20,
+  },
+  eventsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#2473B3',
+  },
+  eventItem: {
+    padding: 15,
+    backgroundColor: '#F5F9FD',
+    borderRadius: 10,
+    marginBottom: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2473B3',
+  },
+  eventTimeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  eventTime: {
+    marginLeft: 5,
+    color: '#666',
+  },
+  eventTitle: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

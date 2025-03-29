@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import MedicationItem from '../../components/onboarding/MedicationItem';
+import { LinearGradient } from 'expo-linear-gradient';
+import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '../../constants/Colors';
 
 // Mock data - this would come from the medical provider in a real app
 const mockMedications = [
@@ -64,80 +66,119 @@ export default function MedicationsScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#2473B3" />
-        </Pressable>
-        <View style={styles.titleContainer}>
-          <Text style={styles.stepText}>Step 2 of 3</Text>
-          <Text style={styles.title}>Confirm Your Medications</Text>
-        </View>
-      </View>
-
-      <View style={styles.card}>
-        <View style={styles.sectionHeader}>
-          <FontAwesome5 name="pills" size={20} color="#2473B3" />
-          <Text style={styles.sectionTitle}>Medications</Text>
-        </View>
-        
-        <Text style={styles.sectionDescription}>
-          Confirm the medications imported from your medical record
-        </Text>
-
-        <View style={styles.medicationsList}>
-          {medications.map(med => (
-            <MedicationItem
-              key={med.id}
-              name={med.name}
-              dosage={med.dosage}
-              schedule={med.schedule}
-              checked={med.checked}
-              onToggle={() => toggleMedication(med.id)}
-            />
-          ))}
-        </View>
-
-        <View style={styles.sectionHeader}>
-          <FontAwesome5 name="allergies" size={20} color="#2473B3" />
-          <Text style={styles.sectionTitle}>Allergies</Text>
-        </View>
-
-        <Text style={styles.sectionDescription}>
-          Confirm any allergies we should know about
-        </Text>
-
-        <View style={styles.allergiesList}>
-          {allergies.map(allergy => (
-            <View key={allergy.id} style={styles.allergyItem}>
-              <Pressable
-                style={[
-                  styles.checkbox,
-                  allergy.checked && styles.checkboxChecked,
-                ]}
-                onPress={() => toggleAllergy(allergy.id)}
-              >
-                {allergy.checked && (
-                  <Ionicons name="checkmark" size={16} color="white" />
-                )}
-              </Pressable>
-              <Text style={styles.allergyName}>{allergy.name}</Text>
-            </View>
-          ))}
-        </View>
-
-        <Pressable
-          style={styles.button}
-          onPress={() => router.push('/onboarding/reminders' as any)}
+    <LinearGradient
+      colors={[primaryBlue, primaryTeal]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      <ScrollView 
+        contentContainerStyle={styles.container} 
+        style={styles.scrollView}
+      >
+        <LinearGradient
+          colors={[primaryBlue, primaryTeal] as const}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.header}
         >
-          <Text style={styles.buttonText}>Confirm & Continue</Text>
-        </Pressable>
-      </View>
-    </ScrollView>
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <Ionicons name="chevron-back" size={24} color={white} />
+          </Pressable>
+          <View style={styles.titleContainer}>
+            <Text style={styles.stepText}>Step 2 of 3</Text>
+            <Text style={styles.title}>Confirm Your Medications</Text>
+          </View>
+        </LinearGradient>
+
+        <View style={styles.card}>
+          <View style={styles.sectionHeader}>
+            <LinearGradient
+              colors={[primaryBlue, primaryTeal] as const}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.iconContainer}
+            >
+              <FontAwesome5 name="pills" size={20} color={white} />
+            </LinearGradient>
+            <Text style={styles.sectionTitle}>Medications</Text>
+          </View>
+          
+          <Text style={styles.sectionDescription}>
+            Confirm the medications imported from your medical record
+          </Text>
+
+          <View style={styles.medicationsList}>
+            {medications.map(med => (
+              <MedicationItem
+                key={med.id}
+                name={med.name}
+                dosage={med.dosage}
+                schedule={med.schedule}
+                checked={med.checked}
+                onToggle={() => toggleMedication(med.id)}
+              />
+            ))}
+          </View>
+
+          <View style={styles.sectionHeader}>
+            <LinearGradient
+              colors={[primaryTeal, primaryBlue] as const}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.iconContainer}
+            >
+              <FontAwesome5 name="allergies" size={20} color={white} />
+            </LinearGradient>
+            <Text style={styles.sectionTitle}>Allergies</Text>
+          </View>
+
+          <Text style={styles.sectionDescription}>
+            Confirm any allergies we should know about
+          </Text>
+
+          <View style={styles.allergiesList}>
+            {allergies.map(allergy => (
+              <View key={allergy.id} style={styles.allergyItem}>
+                <Pressable
+                  style={[
+                    styles.checkbox,
+                    allergy.checked && styles.checkboxChecked,
+                  ]}
+                  onPress={() => toggleAllergy(allergy.id)}
+                >
+                  {allergy.checked && (
+                    <Ionicons name="checkmark" size={16} color={white} />
+                  )}
+                </Pressable>
+                <Text style={styles.allergyName}>{allergy.name}</Text>
+              </View>
+            ))}
+          </View>
+
+          <Pressable
+            onPress={() => router.push('/onboarding/reminders' as any)}
+          >
+            <LinearGradient
+              colors={[primaryBlue, primaryTeal] as const}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>Confirm & Continue</Text>
+            </LinearGradient>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
   container: {
     flexGrow: 1,
     padding: 20,
@@ -147,6 +188,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
+    borderRadius: 15,
+    padding: 15,
   },
   backButton: {
     padding: 8,
@@ -158,17 +201,17 @@ const styles = StyleSheet.create({
   },
   stepText: {
     fontSize: 14,
-    color: '#2473B3',
+    color: white,
     marginBottom: 4,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#0E2A47',
+    color: white,
     textAlign: 'center',
   },
   card: {
-    backgroundColor: 'white',
+    backgroundColor: white,
     borderRadius: 20,
     padding: 24,
     shadowColor: '#000',
@@ -176,21 +219,32 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: lightBlue,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
   },
+  iconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0E2A47',
+    color: darkBlue,
     marginLeft: 8,
   },
   sectionDescription: {
     fontSize: 14,
-    color: '#496583',
+    color: darkBlue,
+    opacity: 0.7,
     marginBottom: 16,
   },
   medicationsList: {
@@ -202,37 +256,32 @@ const styles = StyleSheet.create({
   allergyItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#F5F7FA',
-    borderRadius: 8,
-    marginBottom: 8,
+    marginBottom: 12,
   },
   checkbox: {
-    width: 24,
-    height: 24,
+    width: 22,
+    height: 22,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: '#2473B3',
+    borderColor: primaryBlue,
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 12,
   },
   checkboxChecked: {
-    backgroundColor: '#2473B3',
+    backgroundColor: primaryBlue,
   },
   allergyName: {
     fontSize: 16,
-    marginLeft: 12,
-    color: '#0E2A47',
+    color: darkBlue,
   },
   button: {
-    backgroundColor: '#2473B3',
     borderRadius: 25,
     paddingVertical: 15,
-    width: '100%',
     alignItems: 'center',
   },
   buttonText: {
-    color: 'white',
+    color: white,
     fontSize: 16,
     fontWeight: '600',
   },
