@@ -6,8 +6,10 @@ import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
-
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GoogleGenAI } from "@google/genai";
+import { GOOGLE_API_KEY } from '@/constants/api'; // find a way to hide the API key 
+
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
@@ -24,6 +26,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [loaded, setLoaded] = useState(false);
   const colorScheme = useColorScheme();
+  const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY });
 
   useEffect(() => {
     // Simulate resource loading

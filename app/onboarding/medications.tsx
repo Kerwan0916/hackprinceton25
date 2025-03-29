@@ -67,7 +67,7 @@ export default function MedicationsScreen() {
 
   return (
     <LinearGradient
-      colors={[primaryBlue, white]}
+      colors={[primaryBlue, primaryTeal]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={{ flex: 1 }}

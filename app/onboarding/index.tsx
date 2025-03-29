@@ -3,12 +3,12 @@ import { View, StyleSheet, Text, ScrollView } from 'react-native';
 import OnboardingCard from '../../components/onboarding/OnboardingCard';
 import { AccountIcon, HealthInfoIcon, MedicationsIcon, RemindersIcon } from '../../components/onboarding/OnboardingIcons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
+import { primaryBlue, primaryTeal, darkBlue, lightBlue, offWhite } from '@/constants/Colors';
 
 export default function OnboardingScreen() {
   return (
     <LinearGradient
-      colors={[primaryBlue, white]}
+      colors={[primaryBlue, primaryTeal]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={{ flex: 1 }}
