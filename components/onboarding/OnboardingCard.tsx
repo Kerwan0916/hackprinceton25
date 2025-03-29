@@ -1,6 +1,8 @@
 import React, { ReactNode } from 'react';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { Link } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import { primaryBlue, primaryTeal, darkBlue, lightBlue, white } from '@/constants/Colors';
 
 interface OnboardingCardProps {
   title: string;
@@ -19,14 +21,28 @@ export default function OnboardingCard({
 }: OnboardingCardProps) {
   return (
     <View style={styles.card}>
-      <View style={styles.iconContainer}>{icon}</View>
+      <LinearGradient
+        colors={[lightBlue, 'rgba(91, 191, 186, 0.1)']} 
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.iconContainer}
+      >
+        {icon}
+      </LinearGradient>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
       <Link href={nextScreen as any} asChild>
-        <Pressable style={styles.button}>
-          <Text style={styles.buttonText}>
-            {isLastCard ? 'Get Started' : 'Next'}
-          </Text>
+        <Pressable>
+          <LinearGradient
+            colors={[primaryBlue, primaryTeal] as const}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>
+              {isLastCard ? 'Get Started' : 'Next'}
+            </Text>
+          </LinearGradient>
         </Pressable>
       </Link>
     </View>
@@ -35,7 +51,7 @@ export default function OnboardingCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: 'white',
+    backgroundColor: white,
     borderRadius: 24,
     padding: 24,
     alignItems: 'center',
@@ -47,12 +63,13 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
     marginHorizontal: 8,
+    borderWidth: 1,
+    borderColor: lightBlue,
   },
   iconContainer: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#E3F2F9',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
@@ -60,26 +77,26 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#0E2A47',
+    color: darkBlue,
     marginBottom: 16,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#496583',
+    color: darkBlue,
+    opacity: 0.7,
     textAlign: 'center',
     marginBottom: 36,
   },
   button: {
-    backgroundColor: '#2473B3',
     borderRadius: 25,
     paddingVertical: 15,
-    width: '100%',
+    width: 232,
     alignItems: 'center',
     marginTop: 'auto',
   },
   buttonText: {
-    color: 'white',
+    color: white,
     fontSize: 16,
     fontWeight: '600',
   },
