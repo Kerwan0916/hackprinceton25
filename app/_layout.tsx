@@ -1,6 +1,8 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
+
 import { Stack, Slot, SplashScreen } from 'expo-router';
+import { View } from 'react-native';
+
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
@@ -9,6 +11,9 @@ import { GoogleGenAI } from "@google/genai";
 import { GOOGLE_API_KEY } from '@/constants/api';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+
 
 export {
   // Catch any errors thrown by the Layout component.
