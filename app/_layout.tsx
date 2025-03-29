@@ -8,6 +8,10 @@ import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+// import { GoogleGenAI } from "@google/genai";
+// import { GOOGLE_API_KEY } from '@/constants/api'; // find a way to hide the API key 
+// NOTE: AI feature is temporarily disabled to fix browser API key error
+
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
