@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable, TextInput, ScrollView } from 'react-
 import { router } from 'expo-router';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '../../constants/Colors';
+import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
 
 export default function HealthInfoScreen() {
   const [provider, setProvider] = useState('');

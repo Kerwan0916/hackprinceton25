@@ -2,7 +2,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { primaryBlue, primaryTeal, offWhite } from '../../constants/Colors';
+import { primaryBlue, primaryTeal, offWhite } from '@/constants/Colors';
 
 export default function OnboardingLayout() {
   return (

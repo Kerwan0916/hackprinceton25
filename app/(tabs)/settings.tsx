@@ -1,21 +1,39 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Colors, primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function SettingsScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [darkModeEnabled, setDarkModeEnabled] = React.useState(false);
   const [locationEnabled, setLocationEnabled] = React.useState(true);
+  const colorScheme = useColorScheme() || 'light';
+  const theme = Colors[colorScheme];
   
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <LinearGradient
+        colors={[primaryBlue, primaryTeal] as const}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.header}
+      >
         <Text style={styles.title}>Settings</Text>
-      </View>
+      </LinearGradient>
       
       <ScrollView style={styles.content}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account</Text>
+          <View style={styles.sectionTitleContainer}>
+            <LinearGradient
+              colors={[primaryBlue, primaryTeal] as const}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.accentLine}
+            />
+            <Text style={styles.sectionTitle}>Account</Text>
+          </View>
           
           <Pressable 
             style={({ hovered }) => [
@@ -24,7 +42,7 @@ export default function SettingsScreen() {
             ]}>
             <View style={styles.settingLeft}>
               <View style={styles.iconContainer}>
-                <Ionicons name="person" size={20} color="#2473B3" />
+                <Ionicons name="person" size={20} color={primaryBlue} />
               </View>
               <Text style={styles.settingText}>Profile Information</Text>
             </View>
@@ -38,7 +56,7 @@ export default function SettingsScreen() {
             ]}>
             <View style={styles.settingLeft}>
               <View style={styles.iconContainer}>
-                <Ionicons name="medical" size={20} color="#2473B3" />
+                <Ionicons name="medical" size={20} color={primaryBlue} />
               </View>
               <Text style={styles.settingText}>Health Information</Text>
             </View>
@@ -47,56 +65,87 @@ export default function SettingsScreen() {
         </View>
         
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferences</Text>
+          <View style={styles.sectionTitleContainer}>
+            <LinearGradient
+              colors={[primaryTeal, primaryBlue] as const}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.accentLine}
+            />
+            <Text style={styles.sectionTitle}>Preferences</Text>
+          </View>
           
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <View style={styles.iconContainer}>
-                <Ionicons name="notifications" size={20} color="#2473B3" />
-              </View>
+              <LinearGradient
+                colors={[primaryBlue, primaryTeal] as const}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.iconContainer}
+              >
+                <Ionicons name="notifications" size={20} color={white} />
+              </LinearGradient>
               <Text style={styles.settingText}>Notifications</Text>
             </View>
             <Switch
               value={notificationsEnabled}
               onValueChange={setNotificationsEnabled}
-              trackColor={{ false: '#D9D9D9', true: '#A5C8E1' }}
-              thumbColor={notificationsEnabled ? '#2473B3' : '#F4F4F4'}
+              trackColor={{ false: '#D9D9D9', true: lightBlue }}
+              thumbColor={notificationsEnabled ? primaryBlue : '#F4F4F4'}
             />
           </View>
           
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <View style={styles.iconContainer}>
-                <Ionicons name="moon" size={20} color="#2473B3" />
-              </View>
+              <LinearGradient
+                colors={[primaryTeal, primaryBlue] as const}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.iconContainer}
+              >
+                <Ionicons name="moon" size={20} color={white} />
+              </LinearGradient>
               <Text style={styles.settingText}>Dark Mode</Text>
             </View>
             <Switch
               value={darkModeEnabled}
               onValueChange={setDarkModeEnabled}
-              trackColor={{ false: '#D9D9D9', true: '#A5C8E1' }}
-              thumbColor={darkModeEnabled ? '#2473B3' : '#F4F4F4'}
+              trackColor={{ false: '#D9D9D9', true: lightBlue }}
+              thumbColor={darkModeEnabled ? primaryBlue : '#F4F4F4'}
             />
           </View>
           
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <View style={styles.iconContainer}>
-                <Ionicons name="location" size={20} color="#2473B3" />
-              </View>
+              <LinearGradient
+                colors={[primaryBlue, primaryTeal] as const}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.iconContainer}
+              >
+                <Ionicons name="location" size={20} color={white} />
+              </LinearGradient>
               <Text style={styles.settingText}>Location Services</Text>
             </View>
             <Switch
               value={locationEnabled}
               onValueChange={setLocationEnabled}
-              trackColor={{ false: '#D9D9D9', true: '#A5C8E1' }}
-              thumbColor={locationEnabled ? '#2473B3' : '#F4F4F4'}
+              trackColor={{ false: '#D9D9D9', true: lightBlue }}
+              thumbColor={locationEnabled ? primaryBlue : '#F4F4F4'}
             />
           </View>
         </View>
         
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Support</Text>
+          <View style={styles.sectionTitleContainer}>
+            <LinearGradient
+              colors={[primaryBlue, primaryTeal] as const}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.accentLine}
+            />
+            <Text style={styles.sectionTitle}>Support</Text>
+          </View>
           
           <Pressable 
             style={({ hovered }) => [
@@ -104,9 +153,14 @@ export default function SettingsScreen() {
               hovered && styles.pressableActive
             ]}>
             <View style={styles.settingLeft}>
-              <View style={styles.iconContainer}>
-                <Ionicons name="help-circle" size={20} color="#2473B3" />
-              </View>
+              <LinearGradient
+                colors={[primaryTeal, primaryBlue] as const}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.iconContainer}
+              >
+                <Ionicons name="help-circle" size={20} color={white} />
+              </LinearGradient>
               <Text style={styles.settingText}>Help Center</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
@@ -118,9 +172,14 @@ export default function SettingsScreen() {
               hovered && styles.pressableActive
             ]}>
             <View style={styles.settingLeft}>
-              <View style={styles.iconContainer}>
-                <Ionicons name="shield-checkmark" size={20} color="#2473B3" />
-              </View>
+              <LinearGradient
+                colors={[primaryBlue, primaryTeal] as const}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.iconContainer}
+              >
+                <Ionicons name="shield-checkmark" size={20} color={white} />
+              </LinearGradient>
               <Text style={styles.settingText}>Privacy Policy</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
@@ -143,10 +202,9 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: offWhite,
   },
   header: {
-    backgroundColor: '#2473B3',
     paddingTop: 60,
     paddingBottom: 20,
     paddingHorizontal: 20,
@@ -156,7 +214,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'gray',
   },
   title: {
-    color: 'white',
+    color: white,
     fontSize: 22,
     fontWeight: 'bold',
   },
@@ -166,7 +224,7 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 24,
-    backgroundColor: 'white',
+    backgroundColor: white,
     borderRadius: 10,
     padding: 16,
     shadowColor: '#000',
@@ -175,13 +233,23 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 1,
     borderWidth: 1,
-    borderColor: '#E0F3F9',
+    borderColor: lightBlue,
+  },
+  sectionTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  accentLine: {
+    width: 20,
+    height: 3,
+    borderRadius: 1.5,
+    marginRight: 8,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0E2A47',
-    marginBottom: 16,
+    color: darkBlue,
   },
   settingItem: {
     flexDirection: 'row',
@@ -189,7 +257,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0F3F9',
+    borderBottomColor: lightBlue,
   },
   settingLeft: {
     flexDirection: 'row',
@@ -199,14 +267,13 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#E0F3F9',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
   settingText: {
     fontSize: 16,
-    color: '#0E2A47',
+    color: darkBlue,
   },
   logoutItem: {
     justifyContent: 'center',

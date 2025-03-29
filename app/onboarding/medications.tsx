@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import MedicationItem from '../../components/onboarding/MedicationItem';
 import { LinearGradient } from 'expo-linear-gradient';
-import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '../../constants/Colors';
+import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
 
 // Mock data - this would come from the medical provider in a real app
 const mockMedications = [
