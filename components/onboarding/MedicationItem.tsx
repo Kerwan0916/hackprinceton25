@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Checkbox from './Checkbox';
+import { darkBlue, lightBlue, white, primaryBlue } from '@/constants/Colors';
 
 interface MedicationItemProps {
   name: string;
@@ -33,7 +34,7 @@ export default function MedicationItem({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
+    backgroundColor: white,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -42,6 +43,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: lightBlue,
   },
   row: {
     flexDirection: 'row',
@@ -50,7 +53,7 @@ const styles = StyleSheet.create({
   medicationName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0E2A47',
+    color: darkBlue,
     marginLeft: 12,
   },
   detailsContainer: {
@@ -59,11 +62,12 @@ const styles = StyleSheet.create({
   },
   dosageText: {
     fontSize: 14,
-    color: '#496583',
+    color: darkBlue,
+    opacity: 0.7,
   },
   scheduleText: {
     fontSize: 12,
-    color: '#6C87A0',
+    color: primaryBlue,
     marginTop: 4,
   },
 }); 

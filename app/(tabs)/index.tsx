@@ -4,56 +4,101 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import { Colors } from '../../constants/Colors';
+import { Colors, primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function HomeScreen() {
   const userName = "Name"; // This would come from user profile in a real app
+  const colorScheme = useColorScheme() || 'light';
+  const theme = Colors[colorScheme];
   
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <LinearGradient
+        colors={[primaryBlue, primaryTeal] as const}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.header}
+      >
         <View>
           <Text style={styles.welcomeText}>Welcome back,</Text>
           <Text style={styles.nameText}>{userName}!</Text>
         </View>
         <View style={styles.avatarContainer}>
-          <Ionicons name="person" size={40} color="#2473B3" />
+          <Ionicons name="person" size={40} color={primaryBlue} />
         </View>
-      </View>
+      </LinearGradient>
       
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
         <Pressable style={styles.card}>
-          <View style={[styles.iconContainer, { backgroundColor: '#2473B3' }]}>
+          <LinearGradient
+            colors={[primaryTeal, primaryBlue] as const}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.iconContainer}
+          >
             <Ionicons name="checkmark" size={24} color="white" />
-          </View>
+          </LinearGradient>
           <Text style={styles.cardTitle}>Daily Check-in</Text>
         </Pressable>
         
         <Pressable style={styles.card}>
-          <View style={[styles.iconContainer, { backgroundColor: '#2473B3' }]}>
+          <LinearGradient
+            colors={[primaryBlue, primaryTeal] as const}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.iconContainer}
+          >
             <FontAwesome5 name="prescription-bottle-alt" size={24} color="white" />
-          </View>
+          </LinearGradient>
           <View style={styles.medicationContent}>
             <Text style={styles.cardTitle}>Medications & Schedule</Text>
             <Text style={styles.reminderText}>Next reminder at 2:00 PM</Text>
           </View>
         </Pressable>
         
-        <Pressable style={[styles.card, styles.medicalInfoCard]}>
-          <View style={[styles.iconContainer, { backgroundColor: '#2473B3' }]}>
-            <FontAwesome5 name="heart" size={24} color="white" />
-          </View>
-          <Text style={styles.cardTitle}>Medical Information</Text>
-        </Pressable>
+        <LinearGradient
+          colors={[lightBlue, 'rgba(91, 191, 186, 0.2)'] as const}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.gradientCard}
+        >
+          <Pressable style={styles.pressableCard}>
+            <LinearGradient
+              colors={[primaryTeal, primaryBlue] as const}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.iconContainer}
+            >
+              <FontAwesome5 name="heart" size={24} color="white" />
+            </LinearGradient>
+            <Text style={styles.cardTitle}>Medical Information</Text>
+          </Pressable>
+        </LinearGradient>
         
-        <Pressable style={[styles.card, styles.askQuestionCard]}>
-          <View style={[styles.iconContainer, { backgroundColor: '#2473B3' }]}>
-            <Ionicons name="chatbubble-ellipses-outline" size={24} color="white" />
-          </View>
-          <Text style={styles.cardTitle}>Ask a Question</Text>
-        </Pressable>
+        <LinearGradient
+          colors={[lightBlue, lightBlue] as const}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.gradientCard}
+        >
+          <Pressable style={styles.pressableCard}>
+            <LinearGradient
+              colors={[primaryBlue, primaryTeal] as const}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.iconContainer}
+            >
+              <Ionicons name="chatbubble-ellipses-outline" size={24} color="white" />
+            </LinearGradient>
+            <Text style={styles.cardTitle}>Ask a Question</Text>
+          </Pressable>
+        </LinearGradient>
+        
+        
       </ScrollView>
     </View>
   );
@@ -62,7 +107,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: offWhite,
   },
   header: {
     flexDirection: 'row',
@@ -70,22 +115,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     paddingTop: 60,
-    backgroundColor: '#2473B3',
   },
   welcomeText: {
     fontSize: 26,
-    color: 'white',
+    color: white,
   },
   nameText: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: 'white',
+    color: white,
   },
   avatarContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'white',
+    backgroundColor: white,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -99,7 +143,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: white,
     borderRadius: 15,
     padding: 20,
     marginBottom: 15,
@@ -109,7 +153,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     borderWidth: 1,
-    borderColor: '#E0F3F9',
+    borderColor: lightBlue,
   },
   iconContainer: {
     width: 50,
@@ -122,20 +166,65 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0E2A47',
+    color: darkBlue,
   },
   medicationContent: {
     flex: 1,
   },
   reminderText: {
     fontSize: 14,
-    color: '#2473B3',
+    color: primaryBlue,
     marginTop: 5,
   },
-  medicalInfoCard: {
-    backgroundColor: '#E0F3F9',
+  gradientCard: {
+    borderRadius: 15,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  askQuestionCard: {
-    backgroundColor: 'white',
+  pressableCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    borderRadius: 15,
+  },
+  testimonialSection: {
+    marginTop: 20,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: darkBlue,
+    marginBottom: 15,
+  },
+  testimonial: {
+    backgroundColor: white,
+    borderRadius: 15,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  accentLine: {
+    height: 3,
+    width: 40,
+    borderRadius: 2,
+    marginBottom: 15,
+  },
+  testimonialText: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    color: darkBlue,
+    marginBottom: 15,
+  },
+  testimonialAuthor: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: primaryBlue,
   },
 });

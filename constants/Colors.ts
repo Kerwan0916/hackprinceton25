@@ -3,24 +3,46 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+/**
+ * Color scheme for CareBlue
+ * Primary colors and derived colors for consistent styling
+ */
+
+// Primary Colors
+export const primaryBlue = '#4A90E2';
+export const primaryTeal = '#5BBFBA';
+
+// Derived Colors
+export const darkBlue = '#1B365D';
+export const lightBlue = '#C5DAFF';
+export const white = '#FFFFFF';
+export const offWhite = '#F8F9FA';
+export const lightGray = '#EFEFEF';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: darkBlue,
+    background: offWhite,
+    cardBackground: white,
+    tint: primaryBlue,
+    tintSecondary: primaryTeal,
+    tabIconDefault: darkBlue,
+    tabIconSelected: primaryBlue,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: white,
+    background: darkBlue,
+    cardBackground: '#243B5D',
+    tint: primaryTeal,
+    tintSecondary: primaryBlue,
+    tabIconDefault: lightBlue,
+    tabIconSelected: primaryTeal,
   },
+  // Gradients
+  gradients: {
+    headerFooter: [primaryBlue, primaryTeal],
+    cardPrimary: [lightBlue, lightGray],
+    cardSecondary: [lightBlue, `rgba(91, 191, 186, 0.2)`],
+    testimonial: [primaryTeal, primaryBlue],
+  }
 };
