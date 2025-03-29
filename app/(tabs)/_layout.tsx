@@ -35,7 +35,7 @@ function AIAgentButton() {
 
 // Tab layout with blue and teal theme
 export default function TabLayout() {
-  const colorScheme = useColorScheme() || 'light';
+  const colorScheme = (useColorScheme() || 'light') as 'light' | 'dark';
   const theme = Colors[colorScheme];
   
   return (
