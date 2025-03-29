@@ -8,7 +8,14 @@ import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GoogleGenAI } from "@google/genai";
-import { GOOGLE_API_KEY } from '@/constants/api';
+
+// Import API key or use a placeholder
+let GOOGLE_API_KEY = "";
+try {
+  GOOGLE_API_KEY = require('@/constants/api').GOOGLE_API_KEY;
+} catch (error) {
+  console.warn("API key not found, using empty string");
+}
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 

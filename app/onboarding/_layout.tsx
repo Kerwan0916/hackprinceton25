@@ -1,15 +1,22 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { primaryBlue, primaryTeal, offWhite } from '@/constants/Colors';
 
 export default function OnboardingLayout() {
   return (
-    <View style={{ flex: 1, backgroundColor: '#E3F2F9' }}>
-      <StatusBar style="dark" />
+    <LinearGradient
+      colors={[primaryBlue, primaryTeal]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      <StatusBar style="light" />
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: '#E3F2F9' },
+          contentStyle: { backgroundColor: 'transparent' },
           animation: 'slide_from_right',
         }}
       >
@@ -17,6 +24,6 @@ export default function OnboardingLayout() {
         <Stack.Screen name="medications" />
         <Stack.Screen name="reminders" />
       </Stack>
-    </View>
+    </LinearGradient>
   );
 } 

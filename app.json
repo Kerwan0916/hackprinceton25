@@ -1,20 +1,26 @@
 {
   "expo": {
-    "name": "hackprinceton25",
-    "slug": "hackprinceton25",
+    "name": "CareBlue",
+    "slug": "careblue",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "backgroundColor": "#F8F9FA",
+    "primaryColor": "#4A90E2",
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#4A90E2"
+      },
+      "statusBar": {
+        "backgroundColor": "#4A90E2",
+        "barStyle": "light-content"
       }
     },
     "web": {
@@ -30,7 +36,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#4A90E2"
         }
       ]
     ],
