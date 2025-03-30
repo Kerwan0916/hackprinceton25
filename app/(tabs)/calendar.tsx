@@ -19,7 +19,15 @@ import userData from '@/app/data/userData.json';
 function Calendar(){
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [events, setEvents] = useState<Array<{date: string; title: string; time: string}>>([]);
+  
+  const [events, setEvents] = useState<Array<{date: string; title: string; time: string}>>([
+    { date: new Date().toISOString().split('T')[0], title: 'Take Medication', time: '8:00 AM' },
+    { date: new Date().toISOString().split('T')[0], title: 'Take Medication', time: '12:00 PM' },
+    { date: new Date().toISOString().split('T')[0], title: 'Doctor Appointment', time: '2:30 PM' },
+    { date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0], title: 'Lab Test', time: '7:00 PM' },
+    { date: new Date().toISOString().split('T')[0], title: 'Take Medication', time: '10:00 PM' },
+  ]);
+
   const { isDayCompleted } = useMedication();
 
   // Generate medication events for the selected date
@@ -155,7 +163,7 @@ function Calendar(){
           style={styles.scheduleButtonGradient}
         >
           <Ionicons name="calendar-outline" size={20} color={white} />
-          <Text style={styles.scheduleButtonText}>See Daily Schedule</Text>
+          <Text style={styles.scheduleButtonText}>See Your Detailed Daily Medication Schedule</Text>
         </LinearGradient>
       </Pressable>
 

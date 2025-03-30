@@ -7,6 +7,32 @@ import { router } from 'expo-router';
 import { useMedication } from '@/app/context/MedicationContext';
 import userData from '@/app/data/userData.json';
 
+
+// Mock data - this would come from your medication database
+/* const mockMedications = [
+  {
+    id: '1',
+    name: 'Lisinopril',
+    dosage: '10mg',
+    time: '8:00 AM',
+    checked: false,
+  },
+  {
+    id: '2',
+    name: 'Metformin',
+    dosage: '500mg',
+    time: '12:00 PM',
+    checked: false,
+  },
+  {
+    id: '3',
+    name: 'Atorvastatin',
+    dosage: '20mg',
+    time: '10:00 PM',
+    checked: false,
+  },
+]; */
+
 // Define types for our medication data
 interface FlattenedMedication {
   id: string;
@@ -57,6 +83,7 @@ const flattenMedications = (): FlattenedMedication[] => {
     return timeA - timeB;
   });
 };
+
 
 export default function ScheduleScreen() {
   const [medications, setMedications] = useState<FlattenedMedication[]>(flattenMedications());

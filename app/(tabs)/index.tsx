@@ -25,7 +25,7 @@ export default function HomeScreen() {
         style={styles.header}
       >
         <View>
-          <Text style={styles.welcomeText}>Welcome back,</Text>
+          <Text style={styles.welcomeText}>Welcome back to Syndra,</Text>
           <Text style={styles.nameText}>{userName}!</Text>
         </View>
         <View style={styles.avatarContainer}>
@@ -62,7 +62,31 @@ export default function HomeScreen() {
         </Pressable>
         
         <LinearGradient
-          colors={[lightBlue, 'rgba(91, 191, 186, 0.2)'] as const}
+
+          colors={[lightBlue, lightBlue] as const}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.gradientCard}
+        >
+          <Pressable style={styles.pressableCard} onPress={() => router.push('/schedule' as any)}>
+            <LinearGradient
+              colors={[primaryBlue, primaryTeal] as const}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.iconContainer}
+            >
+              <FontAwesome5 name="prescription-bottle-alt" size={24} color="white" />
+            </LinearGradient>
+            <View style={styles.medicationContent}>
+              <Text style={styles.cardTitle}>Medications & Schedule</Text>
+              <Text style={styles.reminderText}>Next reminder at 2:30 PM</Text>
+            </View>
+          </Pressable>
+        </LinearGradient>
+
+        <LinearGradient
+          colors={[lightBlue, lightBlue] as const}
+
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={styles.gradientCard}
