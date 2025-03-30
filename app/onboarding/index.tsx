@@ -20,7 +20,7 @@ export default function OnboardingScreen() {
           end={{ x: 1, y: 0 }}
           style={styles.headerGradient}
         >
-          <Text style={styles.heading}>Welcome to CareBlue</Text>
+          <Text style={styles.heading}>Welcome to Syndra</Text>
           <Text style={styles.subheading}>Let's set up your account</Text>
         </LinearGradient>
         
