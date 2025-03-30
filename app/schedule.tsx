@@ -12,7 +12,7 @@ const mockMedications = [
     id: '1',
     name: 'Lisinopril',
     dosage: '10mg',
-    time: '9:00 AM',
+    time: '8:00 AM',
     checked: false,
   },
   {
@@ -26,7 +26,7 @@ const mockMedications = [
     id: '3',
     name: 'Atorvastatin',
     dosage: '20mg',
-    time: '8:00 PM',
+    time: '10:00 PM',
     checked: false,
   },
 ];

@@ -28,7 +28,7 @@ export default function HomeScreen() {
         style={styles.header}
       >
         <View>
-          <Text style={styles.welcomeText}>Welcome back,</Text>
+          <Text style={styles.welcomeText}>Welcome back to Syndra,</Text>
           <Text style={styles.nameText}>{userName}!</Text>
         </View>
         <View style={styles.avatarContainer}>
@@ -72,7 +72,7 @@ export default function HomeScreen() {
             </LinearGradient>
             <View style={styles.medicationContent}>
               <Text style={styles.cardTitle}>Medications & Schedule</Text>
-              <Text style={styles.reminderText}>Next reminder at 2:00 PM</Text>
+              <Text style={styles.reminderText}>Next reminder at 2:30 PM</Text>
             </View>
           </Pressable>
         </LinearGradient>
