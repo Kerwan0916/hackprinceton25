@@ -43,5 +43,10 @@ constants/api.ts
 # android
 android/
 
+<<<<<<< HEAD
 *.env*
 .env
+=======
+.env:2
+
+>>>>>>> 3c860121 (update gitignore)
