@@ -1,0 +1,3511 @@
+diff --git a/.gitignore b/.gitignore
+index c8280395..d9659407 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -46,4 +46,6 @@ constants/api.ts
+ # android
+ android/
+ 
+-.env
+\ No newline at end of file
++.env
++
++./proxy-server/.env
+\ No newline at end of file
+diff --git a/app/(tabs)/ai-agent.tsx b/app/(tabs)/ai-agent.tsx
+index 401fe0b0..2e8ad9d6 100644
+--- a/app/(tabs)/ai-agent.tsx
++++ b/app/(tabs)/ai-agent.tsx
+@@ -6,6 +6,7 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
+ import { Audio } from 'expo-av';
+ import * as FileSystem from 'expo-file-system';
+ import { Buffer } from 'buffer';
++import userData from '../data/userData.json';
+ 
+ // Access your API key (see "Set up your API key" below)
+ const API_KEY = Constants.expoConfig?.extra?.apiKey;
+@@ -49,9 +50,9 @@ const safetySettings = [
+   },
+ ];
+ 
+-// Define patient information variables that can be updated later
+-let patientName: string | null = null; // This will be set when patient information is available 
+-let patientMedicalHistory: string | null = null; // This will be set when medical history is available
++// Define patient information variables from userData.json
++let patientName: string = userData.name; 
++let patientMedicalHistory: string = userData.medicalHistory; 
+ 
+ // System instruction to guide the AI
+ const systemInstruction = `You are an AI healthcare assistant designed to help patients check in when they feel they might be experiencing symptoms.
+diff --git a/app/(tabs)/index.tsx b/app/(tabs)/index.tsx
+index 03ad4b65..0878b317 100644
+--- a/app/(tabs)/index.tsx
++++ b/app/(tabs)/index.tsx
+@@ -1,21 +1,18 @@
+ import { Image, StyleSheet, Platform, View, ScrollView, Pressable, Text } from 'react-native';
+-// import { useNavigation } from '@react-navigation/native';
+-import { useState } from 'react';
+ 
+ import { HelloWave } from '@/components/HelloWave';
+ import ParallaxScrollView from '@/components/ParallaxScrollView';
+ import { ThemedText } from '@/components/ThemedText';
+ import { ThemedView } from '@/components/ThemedView';
+ import { LinearGradient } from 'expo-linear-gradient';
++import userData from '../data/userData.json';
+ 
+ import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+ import { Colors, primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
+ import { useColorScheme } from '@/hooks/useColorScheme';
+-
+-import { Redirect, router } from 'expo-router';
+-
++import { router } from 'expo-router';
+ export default function HomeScreen() {
+-  const userName = "Name"; // This would come from user profile in a real app
++  const userName = userData.name; // Get name from userData.json
+   const colorScheme = useColorScheme() || 'light';
+   const theme = Colors[colorScheme];
+   
+@@ -37,48 +34,35 @@ export default function HomeScreen() {
+       </LinearGradient>
+       
+       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+-        <LinearGradient
+-          colors={[lightBlue, lightBlue] as const}
+-          start={{ x: 0, y: 0 }}
+-          end={{ x: 0, y: 1 }}
+-          style={styles.gradientCard}>
+-          <Pressable style={styles.pressableCard}>
+-            <LinearGradient
+-              colors={[primaryTeal, primaryBlue] as const}
+-              start={{ x: 0, y: 0 }}
+-              end={{ x: 1, y: 0 }}
+-              style={styles.iconContainer}
+-            >
+-              <Ionicons name="checkmark" size={24} color="white" />
+-            </LinearGradient>
+-            <Text style={styles.cardTitle}>Daily Check-in</Text>
+-          </Pressable>
+-        </LinearGradient>
++        <Pressable style={styles.card}>
++          <LinearGradient
++            colors={[primaryTeal, primaryBlue] as const}
++            start={{ x: 0, y: 0 }}
++            end={{ x: 1, y: 0 }}
++            style={styles.iconContainer}
++          >
++            <Ionicons name="checkmark" size={24} color="white" />
++          </LinearGradient>
++          <Text style={styles.cardTitle}>Daily Check-in</Text>
++        </Pressable>
++        
++        <Pressable style={styles.card} onPress={() => router.push('/schedule' as any)}>
++          <LinearGradient
++            colors={[primaryBlue, primaryTeal] as const}
++            start={{ x: 0, y: 0 }}
++            end={{ x: 1, y: 0 }}
++            style={styles.iconContainer}
++          >
++            <FontAwesome5 name="prescription-bottle-alt" size={24} color="white" />
++          </LinearGradient>
++          <View style={styles.medicationContent}>
++            <Text style={styles.cardTitle}>Medications & Schedule</Text>
++            <Text style={styles.reminderText}>Next reminder at 2:00 PM</Text>
++          </View>
++        </Pressable>
+         
+         <LinearGradient
+-          colors={[lightBlue, lightBlue] as const}
+-          start={{ x: 0, y: 0 }}
+-          end={{ x: 0, y: 1 }}
+-          style={styles.gradientCard}
+-        >
+-          <Pressable style={styles.pressableCard} onPress={() => router.push('/schedule' as any)}>
+-            <LinearGradient
+-              colors={[primaryBlue, primaryTeal] as const}
+-              start={{ x: 0, y: 0 }}
+-              end={{ x: 1, y: 0 }}
+-              style={styles.iconContainer}
+-            >
+-              <FontAwesome5 name="prescription-bottle-alt" size={24} color="white" />
+-            </LinearGradient>
+-            <View style={styles.medicationContent}>
+-              <Text style={styles.cardTitle}>Medications & Schedule</Text>
+-              <Text style={styles.reminderText}>Next reminder at 2:00 PM</Text>
+-            </View>
+-          </Pressable>
+-        </LinearGradient>
+-
+-        <LinearGradient
+-          colors={[lightBlue, lightBlue] as const}
++          colors={[lightBlue, 'rgba(91, 191, 186, 0.2)'] as const}
+           start={{ x: 0, y: 0 }}
+           end={{ x: 0, y: 1 }}
+           style={styles.gradientCard}
+@@ -114,6 +98,8 @@ export default function HomeScreen() {
+             <Text style={styles.cardTitle}>Ask a Question</Text>
+           </Pressable>
+         </LinearGradient>
++        
++        
+       </ScrollView>
+     </View>
+   );
+@@ -242,4 +228,4 @@ const styles = StyleSheet.create({
+     fontWeight: 'bold',
+     color: primaryBlue,
+   },
+-});
+\ No newline at end of file
++});
+diff --git a/app/(tabs)/snap.tsx b/app/(tabs)/snap.tsx
+index 10a897b4..86a4428d 100644
+--- a/app/(tabs)/snap.tsx
++++ b/app/(tabs)/snap.tsx
+@@ -1,5 +1,5 @@
+ import React, { useState, useRef } from 'react';
+-import { View, Text, StyleSheet, TouchableOpacity, Button, ScrollView } from 'react-native';
++import { View, Text, StyleSheet, TouchableOpacity, Button, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
+ import { LinearGradient } from 'expo-linear-gradient';
+ import { Colors, primaryBlue, primaryTeal, white, offWhite } from '@/constants/Colors';
+ import { useColorScheme } from '@/hooks/useColorScheme';
+@@ -7,6 +7,46 @@ import { CameraView, CameraType, useCameraPermissions, CameraCapturedPicture } f
+ import { GoogleGenAI } from '@google/genai';
+ import { GOOGLE_API_KEY } from '@/constants/api';
+ import { SNAP_PROMPT } from '@/constants/snap-prompt';
++import { Ionicons } from '@expo/vector-icons';
++
++// Define the interface for structured medication data
++interface MedicationData {
++  medication_name: string;
++  purpose: string;
++  effects: string;
++  typical_dosage: string;
++  directions_of_use?: string;
++  expiration_date?: string;
++  important_considerations: string;
++  disclaimer: string;
++}
++
++// Card component for displaying medication information
++const MedicationInfoCard = ({ 
++  title, 
++  iconName, 
++  accentColor, 
++  children 
++}: { 
++  title: string, 
++  iconName: keyof typeof Ionicons.glyphMap, 
++  accentColor: string, 
++  children: React.ReactNode 
++}) => {
++  return (
++    <View style={styles.card}>
++      <View style={styles.cardHeader}>
++        <View style={[styles.iconContainer, { backgroundColor: accentColor + '20' }]}>
++          <Ionicons name={iconName} size={24} color={accentColor} />
++        </View>
++        <Text style={styles.cardTitle}>{title}</Text>
++      </View>
++      <View style={styles.cardBody}>
++        <Text style={styles.cardContent}>{children}</Text>
++      </View>
++    </View>
++  );
++};
+ 
+ export default function SnapScreen() {
+   const [facing, setFacing] = useState<CameraType>('back');
+@@ -14,6 +54,7 @@ export default function SnapScreen() {
+   const [isCameraOn, setIsCameraOn] = useState(true);
+   const [picture, setPicture] = useState<string | null>(null);
+   const [aiResponse, setAiResponse] = useState<string | null>(null);
++  const [medicationData, setMedicationData] = useState<MedicationData | null>(null);
+   const [isLoading, setIsLoading] = useState(false);
+   const cameraRef = useRef<CameraView>(null);
+   const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY });
+@@ -34,13 +75,14 @@ export default function SnapScreen() {
+   function toggleCameraFacing() {
+     setFacing(current => (current === 'back' ? 'front' : 'back'));
+   }
+-
++  
++  // This function is kept for compatibility but no longer used in the UI
+   const toggleCamera = () => {
+     setIsCameraOn(!isCameraOn);
+   };
+ 
+   const takePicture = async () => {
+-    if (!cameraRef.current || !isCameraOn) return;
++    if (!cameraRef.current) return;
+ 
+     try {
+       const photo = await cameraRef.current.takePictureAsync({
+@@ -74,6 +116,7 @@ export default function SnapScreen() {
+         },
+       ];
+ 
++      // Use the updated SNAP_PROMPT that already requests JSON formatting
+       const result = await ai.models.generateContent({
+         model: "gemini-2.5-pro-exp-03-25",
+         config: {
+@@ -82,10 +125,45 @@ export default function SnapScreen() {
+         contents: contents,
+       });
+ 
+-      if (result && result.text) {
+-        setAiResponse(result.text);
+-      } else {
+-        setAiResponse('No response received from the AI model.');
++      // Extract the text response
++      let responseText = '';
++      
++      try {
++        // @ts-ignore - Handle different response formats from the AI model
++        if (result && result.text) {
++          // @ts-ignore - text might be a function or a string property
++          responseText = typeof result.text === 'function' ? result.text() : String(result.text);
++        }
++        
++        // If we have a response text, try to parse it as JSON
++        if (responseText) {
++          try {
++            // Find the JSON structure in the response
++            const jsonStart = responseText.indexOf('{');
++            const jsonEnd = responseText.lastIndexOf('}') + 1;
++            
++            if (jsonStart >= 0 && jsonEnd > jsonStart) {
++              const jsonText = responseText.substring(jsonStart, jsonEnd);
++              const data = JSON.parse(jsonText) as MedicationData;
++              setMedicationData(data);
++              
++              // Also set a formatted text version for backward compatibility
++              const formattedText = formatMedicationData(data);
++              setAiResponse(formattedText);
++            } else {
++              // No JSON structure found
++              setAiResponse(responseText);
++            }
++          } catch (parseError) {
++            console.error('Error parsing JSON:', parseError);
++            setAiResponse(responseText);
++          }
++        } else {
++          setAiResponse('No valid response received from the AI model.');
++        }
++      } catch (error) {
++        console.error('Error processing response:', error);
++        setAiResponse('Error processing the AI response.');
+       }
+     } catch (error) {
+       console.error('Error analyzing image:', error);
+@@ -95,14 +173,35 @@ export default function SnapScreen() {
+     }
+   };
+ 
++  const formatMedicationData = (data: MedicationData): string => {
++    return `
++Medication Name: ${data.medication_name}
++
++Purpose: ${data.purpose}
++
++Effects: ${data.effects}
++
++Typical Dosage: ${data.typical_dosage}
++
++${data.directions_of_use ? `Directions of Use: ${data.directions_of_use}\n\n` : ''}
++
++${data.expiration_date ? `Expiration Date: ${data.expiration_date}\n\n` : ''}
++
++Important Considerations: ${data.important_considerations}
++
++Disclaimer: ${data.disclaimer}
++    `;
++  };
++
+   const resetCamera = () => {
+     setPicture(null);
+     setAiResponse(null);
++    setMedicationData(null);
+   };
+ 
+   if (!picture) {
+     return (
+-      <View style={styles.container}>
++      <SafeAreaView style={styles.container}>
+         <LinearGradient
+           colors={[primaryBlue, primaryTeal] as const}
+           start={{ x: 0, y: 0 }}
+@@ -113,49 +212,42 @@ export default function SnapScreen() {
+         </LinearGradient>
+         
+         <View style={styles.cameraContainer}>
+-          {isCameraOn ? (
+-            <CameraView 
+-              ref={cameraRef}
+-              style={styles.camera} 
+-              facing={facing}
++          <CameraView 
++            ref={cameraRef}
++            style={styles.camera} 
++            facing={facing}
++          />
++          
++          {/* Camera controls overlay */}
++          <View style={styles.cameraControlsOverlay}>
++            {/* Flip camera button */}
++            <TouchableOpacity 
++              style={styles.flipCameraButton} 
++              onPress={toggleCameraFacing}
++              activeOpacity={0.7}
+             >
+-              <View style={styles.buttonContainer}>
+-                <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+-                  <Text style={styles.text}>Flip Camera</Text>
+-                </TouchableOpacity>
+-              </View>
+-            </CameraView>
+-          ) : (
+-            <View style={styles.cameraOffContainer}>
+-              <Text style={styles.cameraOffText}>Camera is off</Text>
+-            </View>
+-          )}
+-        </View>
+-
+-        <View style={styles.controlsContainer}>
+-          <TouchableOpacity 
+-            style={[styles.controlButton, isCameraOn ? styles.stopButton : styles.startButton]} 
+-            onPress={toggleCamera}
+-          >
+-            <Text style={styles.buttonText}>
+-              {isCameraOn ? 'Turn Off Camera' : 'Turn On Camera'}
+-            </Text>
+-          </TouchableOpacity>
+-
+-          {isCameraOn && (
++              <Ionicons name="camera-reverse-outline" size={26} color="white" />
++            </TouchableOpacity>
++            
++            {/* Capture button */}
+             <TouchableOpacity 
+-              style={[styles.controlButton, styles.captureButton]} 
++              style={styles.captureButtonCircle} 
+               onPress={takePicture}
++              activeOpacity={0.8}
+             >
+-              <Text style={styles.buttonText}>Take Picture</Text>
++              <View style={styles.captureButtonInner} />
+             </TouchableOpacity>
+-          )}
++            
++            {/* Empty view for balance */}
++            <View style={styles.emptySpace} />
++          </View>
+         </View>
+-      </View>
++      </SafeAreaView>
+     );
+   }
++  
+   return (
+-    <View style={styles.container}>
++    <SafeAreaView style={styles.container}>
+       <LinearGradient
+         colors={[primaryBlue, primaryTeal] as const}
+         start={{ x: 0, y: 0 }}
+@@ -165,9 +257,78 @@ export default function SnapScreen() {
+         <Text style={styles.title}>Analysis Result</Text>
+       </LinearGradient>
+ 
+-      <ScrollView style={styles.resultContainer}>
++      <ScrollView style={styles.resultContainer} contentContainerStyle={styles.resultContent}>
+         {isLoading ? (
+-          <Text style={styles.loadingText}>Analyzing image...</Text>
++          <View style={styles.loadingContainer}>
++            <ActivityIndicator size="large" color="#9C27B0" style={styles.loadingSpinner} />
++            <Text style={styles.loadingText}>Analyzing image...</Text>
++          </View>
++        ) : medicationData ? (
++          <View style={styles.cardsContainer}>
++            <MedicationInfoCard 
++              title="Medication Name" 
++              iconName="medical" 
++              accentColor="#4299e1"
++            >
++              {medicationData.medication_name}
++            </MedicationInfoCard>
++            
++            <MedicationInfoCard 
++              title="Purpose" 
++              iconName="bulb" 
++              accentColor="#48bb78"
++            >
++              {medicationData.purpose}
++            </MedicationInfoCard>
++            
++            <MedicationInfoCard 
++              title="Effects" 
++              iconName="flash" 
++              accentColor="#ed8936"
++            >
++              {medicationData.effects}
++            </MedicationInfoCard>
++            
++            <MedicationInfoCard 
++              title="Typical Dosage" 
++              iconName="calculator" 
++              accentColor="#9f7aea"
++            >
++              {medicationData.typical_dosage}
++            </MedicationInfoCard>
++            
++            {medicationData.directions_of_use && (
++              <MedicationInfoCard 
++                title="Directions of Use" 
++                iconName="document-text" 
++                accentColor="#38b2ac"
++              >
++                {medicationData.directions_of_use}
++              </MedicationInfoCard>
++            )}
++            
++            {medicationData.expiration_date && (
++              <MedicationInfoCard 
++                title="Expiration Date" 
++                iconName="time" 
++                accentColor="#667eea"
++              >
++                {medicationData.expiration_date}
++              </MedicationInfoCard>
++            )}
++            
++            <MedicationInfoCard 
++              title="Important Considerations" 
++              iconName="warning" 
++              accentColor="#e53e3e"
++            >
++              {medicationData.important_considerations}
++            </MedicationInfoCard>
++            
++            <View style={styles.disclaimerContainer}>
++              <Text style={styles.disclaimer}>{medicationData.disclaimer}</Text>
++            </View>
++          </View>
+         ) : (
+           <Text style={styles.resultText}>{aiResponse}</Text>
+         )}
+@@ -175,13 +336,14 @@ export default function SnapScreen() {
+ 
+       <View style={styles.controlsContainer}>
+         <TouchableOpacity 
+-          style={[styles.controlButton, styles.resetButton]} 
++          style={styles.takeAnotherButton} 
+           onPress={resetCamera}
++          activeOpacity={0.8}
+         >
+           <Text style={styles.buttonText}>Take Another Picture</Text>
+         </TouchableOpacity>
+       </View>
+-    </View>
++    </SafeAreaView>
+   );
+ }
+ 
+@@ -205,37 +367,141 @@ const styles = StyleSheet.create({
+     flex: 1,
+     backgroundColor: 'black',
+     margin: 20,
+-    borderRadius: 10,
++    borderRadius: 20,
+     overflow: 'hidden',
++    position: 'relative',
+   },
+   camera: {
+     flex: 1,
+   },
+-  cameraOffContainer: {
++  cameraControlsOverlay: {
++    position: 'absolute',
++    bottom: 40,
++    left: 0,
++    right: 0,
++    flexDirection: 'row',
++    justifyContent: 'space-around',
++    alignItems: 'center',
++    paddingHorizontal: 30,
++  },
++  captureButtonCircle: {
++    width: 80,
++    height: 80,
++    borderRadius: 40,
++    backgroundColor: 'rgba(255, 255, 255, 0.25)',
++    justifyContent: 'center',
++    alignItems: 'center',
++    borderWidth: 5,
++    borderColor: 'white',
++  },
++  captureButtonInner: {
++    width: 60,
++    height: 60,
++    borderRadius: 30,
++    backgroundColor: 'white',
++  },
++  flipCameraButton: {
++    width: 50,
++    height: 50,
++    borderRadius: 25,
++    backgroundColor: 'rgba(0, 0, 0, 0.3)',
++    justifyContent: 'center',
++    alignItems: 'center',
++  },
++  emptySpace: {
++    width: 50,
++  },
++  message: {
++    textAlign: 'center',
++    paddingBottom: 10,
++  },
++  resultContainer: {
++    flex: 1,
++    backgroundColor: offWhite,
++    margin: 0,
++  },
++  resultText: {
++    fontSize: 16,
++    lineHeight: 24,
++    color: '#333',
++    padding: 20,
++  },
++  loadingContainer: {
+     flex: 1,
+     justifyContent: 'center',
+     alignItems: 'center',
+-    backgroundColor: '#1a1a1a',
++    paddingVertical: 50,
+   },
+-  cameraOffText: {
+-    color: white,
++  loadingSpinner: {
++    width: 80,
++    height: 80,
++    marginBottom: 20,
++  },
++  loadingText: {
+     fontSize: 18,
++    textAlign: 'center',
++    color: '#666',
++    marginTop: 20,
+   },
+-  buttonContainer: {
+-    flex: 1,
++  resultContent: {
++    paddingBottom: 20,
++  },
++  cardsContainer: {
++    alignItems: 'center',
++    width: '100%',
++  },
++  card: {
++    backgroundColor: white,
++    borderRadius: 12,
++    marginBottom: 16,
++    shadowColor: '#000',
++    shadowOffset: { width: 0, height: 2 },
++    shadowOpacity: 0.1,
++    shadowRadius: 4,
++    elevation: 2,
++    width: '90%',
++    overflow: 'hidden',
++  },
++  cardHeader: {
+     flexDirection: 'row',
+-    backgroundColor: 'transparent',
+-    margin: 64,
++    alignItems: 'center',
++    padding: 12,
++    borderBottomWidth: 1,
++    borderBottomColor: '#f0f0f0',
+   },
+-  button: {
+-    flex: 1,
+-    alignSelf: 'flex-end',
++  iconContainer: {
++    width: 40,
++    height: 40,
++    borderRadius: 20,
++    justifyContent: 'center',
+     alignItems: 'center',
++    marginRight: 12,
+   },
+-  text: {
+-    fontSize: 24,
++  cardTitle: {
++    fontSize: 16,
+     fontWeight: 'bold',
+-    color: 'white',
++    color: '#333',
++  },
++  cardBody: {
++    padding: 16,
++  },
++  cardContent: {
++    fontSize: 14,
++    lineHeight: 22,
++    color: '#666',
++  },
++  disclaimerContainer: {
++    width: '90%',
++    marginTop: 16,
++    padding: 16,
++    borderTopWidth: 1,
++    borderTopColor: '#eee',
++  },
++  disclaimer: {
++    fontSize: 14,
++    lineHeight: 20,
++    color: '#666',
++    fontStyle: 'italic',
+   },
+   controlsContainer: {
+     flexDirection: 'row',
+@@ -243,23 +509,12 @@ const styles = StyleSheet.create({
+     padding: 20,
+     gap: 20,
+   },
+-  controlButton: {
++  takeAnotherButton: {
+     paddingHorizontal: 20,
+     paddingVertical: 10,
+     borderRadius: 8,
+     minWidth: 120,
+     alignItems: 'center',
+-  },
+-  startButton: {
+-    backgroundColor: '#4CAF50',
+-  },
+-  stopButton: {
+-    backgroundColor: '#f44336',
+-  },
+-  captureButton: {
+-    backgroundColor: '#2196F3',
+-  },
+-  resetButton: {
+     backgroundColor: '#9C27B0',
+   },
+   buttonText: {
+@@ -267,31 +522,4 @@ const styles = StyleSheet.create({
+     fontSize: 16,
+     fontWeight: 'bold',
+   },
+-  message: {
+-    textAlign: 'center',
+-    paddingBottom: 10,
+-  },
+-  resultContainer: {
+-    flex: 1,
+-    padding: 20,
+-    backgroundColor: white,
+-    margin: 20,
+-    borderRadius: 10,
+-    shadowColor: '#000',
+-    shadowOffset: { width: 0, height: 2 },
+-    shadowOpacity: 0.1,
+-    shadowRadius: 4,
+-    elevation: 3,
+-  },
+-  resultText: {
+-    fontSize: 16,
+-    lineHeight: 24,
+-    color: '#333',
+-  },
+-  loadingText: {
+-    fontSize: 18,
+-    textAlign: 'center',
+-    color: '#666',
+-    marginTop: 20,
+-  },
+ }); 
+\ No newline at end of file
+diff --git a/app/data/userData.json b/app/data/userData.json
+new file mode 100644
+index 00000000..b1926659
+--- /dev/null
++++ b/app/data/userData.json
+@@ -0,0 +1,108 @@
++{
++  "name": "Sarah Johnson",
++  "medicalHistory": "47-year-old female with history of hypertension and type 2 diabetes diagnosed in 2018. Underwent appendectomy in 2010. Family history of cardiovascular disease. Non-smoker.",
++  "medications": [
++    {
++      "id": "1",
++      "name": "Ibuprofen",
++      "dosage": "10mg",
++      "schedule": "Take once daily in the morning",
++      "checked": true,
++      "timeIds": ["morning"],
++      "times": {
++        "morning": "2023-05-01T08:00:00.000Z"
++      }
++    },
++    {
++      "id": "2",
++      "name": "Oxycodone",
++      "dosage": "500mg",
++      "schedule": "Take twice daily with meals",
++      "checked": true,
++      "timeIds": ["morning", "evening"],
++      "times": {
++        "morning": "2023-05-01T08:00:00.000Z",
++        "evening": "2023-05-01T18:00:00.000Z"
++      }
++    },
++    {
++      "id": "3",
++      "name": "Atorvastatin",
++      "dosage": "20mg",
++      "schedule": "Take once daily at bedtime",
++      "checked": true,
++      "timeIds": ["bedtime"],
++      "times": {
++        "bedtime": "2023-05-01T22:00:00.000Z"
++      }
++    },
++    {
++      "id": "4",
++      "name": "Levothyroxine",
++      "dosage": "50mcg",
++      "schedule": "Take once daily on an empty stomach",
++      "checked": true,
++      "timeIds": ["morning"],
++      "times": {
++        "morning": "2023-05-01T08:00:00.000Z"
++      }
++    }
++  ],
++  "allergies": [
++    { "id": "1", "name": "Penicillin", "checked": true },
++    { "id": "2", "name": "Sulfa Drugs", "checked": true },
++    { "id": "3", "name": "Aspirin", "checked": true }
++  ],
++  "timeOptions": [
++    { 
++      "id": "morning", 
++      "label": "Morning", 
++      "icon": "weather-sunny", 
++      "displayText": "Take in the morning", 
++      "startHour": 5, 
++      "endHour": 10,
++      "defaultHour": 8,
++      "defaultMinute": 0
++    },
++    { 
++      "id": "afternoon", 
++      "label": "Afternoon", 
++      "icon": "weather-partly-cloudy", 
++      "displayText": "Take in the afternoon",
++      "startHour": 11, 
++      "endHour": 16,
++      "defaultHour": 13,
++      "defaultMinute": 0
++    },
++    { 
++      "id": "evening", 
++      "label": "Evening", 
++      "icon": "weather-sunset", 
++      "displayText": "Take in the evening",
++      "startHour": 17, 
++      "endHour": 20,
++      "defaultHour": 18,
++      "defaultMinute": 0
++    },
++    { 
++      "id": "bedtime", 
++      "label": "Bedtime", 
++      "icon": "bed", 
++      "displayText": "Take at bedtime",
++      "startHour": 21, 
++      "endHour": 23,
++      "defaultHour": 22,
++      "defaultMinute": 0
++    },
++    { 
++      "id": "custom", 
++      "label": "Custom Schedule", 
++      "icon": "clock-outline", 
++      "displayText": "Custom schedule",
++      "startHour": 0,
++      "endHour": 23,
++      "defaultHour": 12,
++      "defaultMinute": 0
++    }
++  ]
++} 
+\ No newline at end of file
+diff --git a/app/onboarding/_layout.tsx b/app/onboarding/_layout.tsx
+index 5b2043a7..59b9df8e 100644
+--- a/app/onboarding/_layout.tsx
++++ b/app/onboarding/_layout.tsx
+@@ -22,7 +22,6 @@ export default function OnboardingLayout() {
+       >
+         <Stack.Screen name="health-info" />
+         <Stack.Screen name="medications" />
+-        <Stack.Screen name="reminders" />
+       </Stack>
+     </LinearGradient>
+   );
+diff --git a/app/onboarding/health-info.tsx b/app/onboarding/health-info.tsx
+index f793898a..93ad5a1c 100644
+--- a/app/onboarding/health-info.tsx
++++ b/app/onboarding/health-info.tsx
+@@ -6,16 +6,27 @@ import { LinearGradient } from 'expo-linear-gradient';
+ import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
+ 
+ export default function HealthInfoScreen() {
+-  const [provider, setProvider] = useState('');
+-  const [importing, setImporting] = useState(false);
++  const [username, setUsername] = useState('');
++  const [password, setPassword] = useState('');
++  const [loggingIn, setLoggingIn] = useState(false);
+ 
+   const handleSignIn = () => {
+-    setImporting(true);
+-    // Simulate importing data
++    setLoggingIn(true);
++    // Simulate login process
+     setTimeout(() => {
+-      setImporting(false);
++      setLoggingIn(false);
+       router.push('/onboarding/medications' as any);
+-    }, 2000);
++    }, 1000);
++  };
++
++  const handleForgotPassword = () => {
++    // Placeholder function
++    alert('Forgot Password functionality would go here');
++  };
++
++  const handleCreateAccount = () => {
++    // Placeholder function
++    alert('Create Account functionality would go here');
+   };
+ 
+   return (
+@@ -45,68 +56,45 @@ export default function HealthInfoScreen() {
+             start={{ x: 0, y: 0 }}
+             end={{ x: 0, y: 1 }}
+           >
+-            <FontAwesome5 name="hospital-user" size={50} color={primaryBlue} />
++            <FontAwesome5 name="user-circle" size={50} color={primaryBlue} />
+           </LinearGradient>
+           
+           <Text style={styles.subtitle}>
+-            Sign in with your medical provider
++            Sign in to your account
+           </Text>
+           
+           <Text style={styles.description}>
+-            We'll securely import your medical history, medications, and allergies
++            Enter your login details to access all features
+           </Text>
+           
+           <View style={styles.inputContainer}>
+-            <Text style={styles.label}>Healthcare Provider</Text>
++            <Text style={styles.label}>Username</Text>
+             <TextInput
+               style={styles.input}
+-              placeholder="Search for your provider"
+-              value={provider}
+-              onChangeText={setProvider}
++              placeholder="Enter your username"
++              value={username}
++              onChangeText={setUsername}
+             />
+           </View>
+ 
+-          <View style={styles.providerOptions}>
+-            <Pressable style={styles.providerOption}>
+-              <LinearGradient
+-                colors={[primaryBlue, primaryTeal] as const}
+-                style={styles.providerIconContainer}
+-                start={{ x: 0, y: 0 }}
+-                end={{ x: 1, y: 0 }}
+-              >
+-                <FontAwesome5 name="hospital" size={20} color={white} />
+-              </LinearGradient>
+-              <Text style={styles.providerName}>Hospital Network</Text>
+-            </Pressable>
+-            
+-            <Pressable style={styles.providerOption}>
+-              <LinearGradient
+-                colors={[primaryTeal, primaryBlue] as const}
+-                style={styles.providerIconContainer}
+-                start={{ x: 0, y: 0 }}
+-                end={{ x: 1, y: 0 }}
+-              >
+-                <FontAwesome5 name="clinic-medical" size={20} color={white} />
+-              </LinearGradient>
+-              <Text style={styles.providerName}>Family Clinic</Text>
+-            </Pressable>
+-            
+-            <Pressable style={styles.providerOption}>
+-              <LinearGradient
+-                colors={[primaryBlue, primaryTeal] as const}
+-                style={styles.providerIconContainer}
+-                start={{ x: 0, y: 0 }}
+-                end={{ x: 1, y: 0 }}
+-              >
+-                <FontAwesome5 name="user-md" size={20} color={white} />
+-              </LinearGradient>
+-              <Text style={styles.providerName}>Private Practice</Text>
++          <View style={styles.inputContainer}>
++            <Text style={styles.label}>Password</Text>
++            <TextInput
++              style={styles.input}
++              placeholder="Enter your password"
++              value={password}
++              onChangeText={setPassword}
++              secureTextEntry
++            />
++            <Pressable onPress={handleForgotPassword} style={styles.forgotPasswordContainer}>
++              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+             </Pressable>
+           </View>
+ 
+           <Pressable 
+             onPress={handleSignIn}
+-            disabled={importing}
++            disabled={loggingIn}
++            style={{width: '100%', marginTop: 16}}
+           >
+             <LinearGradient
+               colors={[primaryBlue, primaryTeal] as const}
+@@ -115,13 +103,18 @@ export default function HealthInfoScreen() {
+               end={{ x: 1, y: 0 }}
+             >
+               <Text style={styles.buttonText}>
+-                {importing ? 'Importing...' : 'Sign In & Import'}
++                {loggingIn ? 'Signing in...' : 'Sign In'}
+               </Text>
+             </LinearGradient>
+           </Pressable>
+           
+-          <Pressable onPress={() => router.push('/onboarding/medications' as any)}>
+-            <Text style={styles.skipText}>Skip for now</Text>
++          <Pressable 
++            onPress={handleCreateAccount}
++            style={{width: '100%'}}
++          >
++            <View style={styles.createAccountButton}>
++              <Text style={styles.createAccountText}>Create Account</Text>
++            </View>
+           </Pressable>
+         </View>
+       </ScrollView>
+@@ -202,41 +195,37 @@ const styles = StyleSheet.create({
+     borderColor: lightBlue,
+     fontSize: 16,
+   },
+-  providerOptions: {
+-    width: '100%',
+-    marginBottom: 24,
++  forgotPasswordContainer: {
++    alignSelf: 'flex-end',
++    marginTop: 8,
+   },
+-  providerOption: {
+-    flexDirection: 'row',
+-    alignItems: 'center',
+-    padding: 12,
+-    borderRadius: 8,
+-    marginBottom: 8,
+-    backgroundColor: '#F5F7FA',
+-    borderWidth: 1,
+-    borderColor: lightBlue,
++  forgotPasswordText: {
++    color: primaryBlue,
++    fontSize: 14,
+   },
+-  providerIconContainer: {
+-    width: 40,
+-    height: 40,
+-    borderRadius: 20,
++  button: {
++    borderRadius: 25,
++    paddingVertical: 15,
++    paddingHorizontal: 40,
+     alignItems: 'center',
+-    justifyContent: 'center',
+-    marginRight: 12,
++    marginBottom: 16,
+   },
+-  providerName: {
++  buttonText: {
++    color: white,
+     fontSize: 16,
+-    color: darkBlue,
++    fontWeight: '600',
+   },
+-  button: {
++  createAccountButton: {
+     borderRadius: 25,
+     paddingVertical: 15,
+     paddingHorizontal: 40,
+     alignItems: 'center',
+     marginBottom: 16,
++    borderWidth: 1,
++    borderColor: primaryBlue,
+   },
+-  buttonText: {
+-    color: white,
++  createAccountText: {
++    color: primaryBlue,
+     fontSize: 16,
+     fontWeight: '600',
+   },
+diff --git a/app/onboarding/index.tsx b/app/onboarding/index.tsx
+index 93d5396c..012cf974 100644
+--- a/app/onboarding/index.tsx
++++ b/app/onboarding/index.tsx
+@@ -1,7 +1,7 @@
+ import React from 'react';
+ import { View, StyleSheet, Text, ScrollView } from 'react-native';
+ import OnboardingCard from '../../components/onboarding/OnboardingCard';
+-import { AccountIcon, HealthInfoIcon, MedicationsIcon, RemindersIcon } from '../../components/onboarding/OnboardingIcons';
++import { AccountIcon, HealthInfoIcon, MedicationsIcon } from '../../components/onboarding/OnboardingIcons';
+ import { LinearGradient } from 'expo-linear-gradient';
+ import { primaryBlue, primaryTeal, darkBlue, lightBlue, offWhite } from '@/constants/Colors';
+ 
+@@ -70,13 +70,6 @@ export default function OnboardingScreen() {
+             title="Add Your Medications" 
+             description="Include your dosages and schedule" 
+             icon={<MedicationsIcon />}
+-            nextScreen="/onboarding/reminders"
+-          />
+-          
+-          <OnboardingCard 
+-            title="Set Reminder Preferences" 
+-            description="Choose when to receive reminders" 
+-            icon={<RemindersIcon />}
+             nextScreen="/(tabs)"
+             isLastCard={true}
+           />
+diff --git a/app/onboarding/medications.styles.ts b/app/onboarding/medications.styles.ts
+new file mode 100644
+index 00000000..6695b84f
+--- /dev/null
++++ b/app/onboarding/medications.styles.ts
+@@ -0,0 +1,115 @@
++import { StyleSheet } from 'react-native';
++import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
++
++export const styles = StyleSheet.create({
++  scrollView: {
++    flex: 1,
++    backgroundColor: 'transparent',
++  },
++  container: {
++    flexGrow: 1,
++    padding: 20,
++    paddingBottom: 40,
++  },
++  header: {
++    flexDirection: 'row',
++    alignItems: 'center',
++    marginBottom: 20,
++    borderRadius: 15,
++    padding: 15,
++  },
++  backButton: {
++    padding: 8,
++  },
++  titleContainer: {
++    flex: 1,
++    alignItems: 'center',
++    marginRight: 40,
++  },
++  stepText: {
++    fontSize: 14,
++    color: white,
++    marginBottom: 4,
++  },
++  title: {
++    fontSize: 20,
++    fontWeight: 'bold',
++    color: white,
++    textAlign: 'center',
++  },
++  card: {
++    backgroundColor: white,
++    borderRadius: 20,
++    padding: 24,
++    shadowColor: '#000',
++    shadowOffset: { width: 0, height: 2 },
++    shadowOpacity: 0.1,
++    shadowRadius: 8,
++    elevation: 3,
++    borderWidth: 1,
++    borderColor: lightBlue,
++  },
++  sectionHeader: {
++    flexDirection: 'row',
++    alignItems: 'center',
++    marginBottom: 8,
++  },
++  iconContainer: {
++    width: 36,
++    height: 36,
++    borderRadius: 18,
++    justifyContent: 'center',
++    alignItems: 'center',
++    marginRight: 8,
++  },
++  sectionTitle: {
++    fontSize: 18,
++    fontWeight: 'bold',
++    color: darkBlue,
++    marginLeft: 8,
++  },
++  sectionDescription: {
++    fontSize: 14,
++    color: darkBlue,
++    opacity: 0.7,
++    marginBottom: 16,
++  },
++  medicationsList: {
++    marginBottom: 24,
++  },
++  allergiesList: {
++    marginBottom: 24,
++  },
++  allergyItem: {
++    flexDirection: 'row',
++    alignItems: 'center',
++    marginBottom: 12,
++  },
++  checkbox: {
++    width: 22,
++    height: 22,
++    borderRadius: 4,
++    borderWidth: 2,
++    borderColor: primaryBlue,
++    alignItems: 'center',
++    justifyContent: 'center',
++    marginRight: 12,
++  },
++  checkboxChecked: {
++    backgroundColor: primaryBlue,
++  },
++  allergyName: {
++    fontSize: 16,
++    color: darkBlue,
++  },
++  button: {
++    borderRadius: 25,
++    paddingVertical: 15,
++    alignItems: 'center',
++  },
++  buttonText: {
++    color: white,
++    fontSize: 16,
++    fontWeight: '600',
++  },
++}); 
+\ No newline at end of file
+diff --git a/app/onboarding/medications.tsx b/app/onboarding/medications.tsx
+index 83ab1a36..0ab0df21 100644
+--- a/app/onboarding/medications.tsx
++++ b/app/onboarding/medications.tsx
+@@ -1,52 +1,20 @@
+ import React, { useState } from 'react';
+-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
++import { View, Text, ScrollView, Pressable } from 'react-native';
+ import { router } from 'expo-router';
+ import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+-import MedicationItem from '../../components/onboarding/MedicationItem';
++import MedicationItem from '@/components/onboarding/MedicationItem';
+ import { LinearGradient } from 'expo-linear-gradient';
+-import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
+-
+-// Mock data - this would come from the medical provider in a real app
+-const mockMedications = [
+-  {
+-    id: '1',
+-    name: 'Lisinopril',
+-    dosage: '10mg',
+-    schedule: 'Take once daily in the morning',
+-  },
+-  {
+-    id: '2',
+-    name: 'Metformin',
+-    dosage: '500mg',
+-    schedule: 'Take twice daily with meals',
+-  },
+-  {
+-    id: '3',
+-    name: 'Atorvastatin',
+-    dosage: '20mg',
+-    schedule: 'Take once daily at bedtime',
+-  },
+-  {
+-    id: '4',
+-    name: 'Levothyroxine',
+-    dosage: '50mcg',
+-    schedule: 'Take once daily on an empty stomach',
+-  },
+-];
+-
+-const mockAllergies = [
+-  { id: '1', name: 'Penicillin' },
+-  { id: '2', name: 'Sulfa Drugs' },
+-  { id: '3', name: 'Aspirin' },
+-];
++import { primaryBlue, primaryTeal, white } from '@/constants/Colors';
++import userData from '../data/userData.json';
++import { styles } from './medications.styles';
+ 
+ export default function MedicationsScreen() {
+   const [medications, setMedications] = useState(
+-    mockMedications.map(med => ({ ...med, checked: true }))
++    userData.medications.map(med => ({ ...med }))
+   );
+   
+   const [allergies, setAllergies] = useState(
+-    mockAllergies.map(allergy => ({ ...allergy, checked: true }))
++    userData.allergies.map(allergy => ({ ...allergy }))
+   );
+ 
+   const toggleMedication = (id: string) => {
+@@ -157,7 +125,7 @@ export default function MedicationsScreen() {
+           </View>
+ 
+           <Pressable
+-            onPress={() => router.push('/onboarding/reminders' as any)}
++            onPress={() => router.push('/(tabs)' as any)}
+           >
+             <LinearGradient
+               colors={[primaryBlue, primaryTeal] as const}
+@@ -172,117 +140,4 @@ export default function MedicationsScreen() {
+       </ScrollView>
+     </LinearGradient>
+   );
+-}
+-
+-const styles = StyleSheet.create({
+-  scrollView: {
+-    flex: 1,
+-    backgroundColor: 'transparent',
+-  },
+-  container: {
+-    flexGrow: 1,
+-    padding: 20,
+-    paddingBottom: 40,
+-  },
+-  header: {
+-    flexDirection: 'row',
+-    alignItems: 'center',
+-    marginBottom: 20,
+-    borderRadius: 15,
+-    padding: 15,
+-  },
+-  backButton: {
+-    padding: 8,
+-  },
+-  titleContainer: {
+-    flex: 1,
+-    alignItems: 'center',
+-    marginRight: 40,
+-  },
+-  stepText: {
+-    fontSize: 14,
+-    color: white,
+-    marginBottom: 4,
+-  },
+-  title: {
+-    fontSize: 20,
+-    fontWeight: 'bold',
+-    color: white,
+-    textAlign: 'center',
+-  },
+-  card: {
+-    backgroundColor: white,
+-    borderRadius: 20,
+-    padding: 24,
+-    shadowColor: '#000',
+-    shadowOffset: { width: 0, height: 2 },
+-    shadowOpacity: 0.1,
+-    shadowRadius: 8,
+-    elevation: 3,
+-    borderWidth: 1,
+-    borderColor: lightBlue,
+-  },
+-  sectionHeader: {
+-    flexDirection: 'row',
+-    alignItems: 'center',
+-    marginBottom: 8,
+-  },
+-  iconContainer: {
+-    width: 36,
+-    height: 36,
+-    borderRadius: 18,
+-    justifyContent: 'center',
+-    alignItems: 'center',
+-    marginRight: 8,
+-  },
+-  sectionTitle: {
+-    fontSize: 18,
+-    fontWeight: 'bold',
+-    color: darkBlue,
+-    marginLeft: 8,
+-  },
+-  sectionDescription: {
+-    fontSize: 14,
+-    color: darkBlue,
+-    opacity: 0.7,
+-    marginBottom: 16,
+-  },
+-  medicationsList: {
+-    marginBottom: 24,
+-  },
+-  allergiesList: {
+-    marginBottom: 24,
+-  },
+-  allergyItem: {
+-    flexDirection: 'row',
+-    alignItems: 'center',
+-    marginBottom: 12,
+-  },
+-  checkbox: {
+-    width: 22,
+-    height: 22,
+-    borderRadius: 4,
+-    borderWidth: 2,
+-    borderColor: primaryBlue,
+-    alignItems: 'center',
+-    justifyContent: 'center',
+-    marginRight: 12,
+-  },
+-  checkboxChecked: {
+-    backgroundColor: primaryBlue,
+-  },
+-  allergyName: {
+-    fontSize: 16,
+-    color: darkBlue,
+-  },
+-  button: {
+-    borderRadius: 25,
+-    paddingVertical: 15,
+-    alignItems: 'center',
+-  },
+-  buttonText: {
+-    color: white,
+-    fontSize: 16,
+-    fontWeight: '600',
+-  },
+-}); 
+\ No newline at end of file
++} 
+\ No newline at end of file
+diff --git a/app/onboarding/reminders.tsx b/app/onboarding/reminders.tsx
+deleted file mode 100644
+index 485d6797..00000000
+--- a/app/onboarding/reminders.tsx
++++ /dev/null
+@@ -1,337 +0,0 @@
+-import React, { useState } from 'react';
+-import { View, Text, StyleSheet, Pressable, ScrollView, Switch } from 'react-native';
+-import { router } from 'expo-router';
+-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+-import { LinearGradient } from 'expo-linear-gradient';
+-import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
+-
+-export default function RemindersScreen() {
+-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+-  const [reminderTimes, setReminderTimes] = useState({
+-    morning: true,
+-    afternoon: true,
+-    evening: true,
+-    bedtime: true,
+-  });
+-
+-  const toggleReminderTime = (time: keyof typeof reminderTimes) => {
+-    setReminderTimes({
+-      ...reminderTimes,
+-      [time]: !reminderTimes[time],
+-    });
+-  };
+-
+-  const handleComplete = () => {
+-    // Navigate to the main app
+-    router.push('/(tabs)' as any);
+-  };
+-
+-  return (
+-    <LinearGradient
+-      colors={[primaryBlue, primaryTeal]}
+-      start={{ x: 0, y: 0 }}
+-      end={{ x: 1, y: 1 }}
+-      style={{ flex: 1 }}
+-    >
+-      <ScrollView 
+-        contentContainerStyle={styles.container} 
+-        style={styles.scrollView}
+-      >
+-        <LinearGradient
+-          colors={[primaryBlue, primaryTeal] as const}
+-          start={{ x: 0, y: 0 }}
+-          end={{ x: 1, y: 0 }}
+-          style={styles.header}
+-        >
+-          <Pressable onPress={() => router.back()} style={styles.backButton}>
+-            <Ionicons name="chevron-back" size={24} color={white} />
+-          </Pressable>
+-          <View style={styles.titleContainer}>
+-            <Text style={styles.stepText}>Step 3 of 3</Text>
+-            <Text style={styles.title}>Set Reminder Preferences</Text>
+-          </View>
+-        </LinearGradient>
+-
+-        <View style={styles.card}>
+-          <LinearGradient
+-            colors={[lightBlue, 'rgba(91, 191, 186, 0.2)']}
+-            style={styles.iconContainer}
+-            start={{ x: 0, y: 0 }}
+-            end={{ x: 0, y: 1 }}
+-          >
+-            <MaterialCommunityIcons
+-              name="calendar-clock"
+-              size={50}
+-              color={primaryTeal}
+-            />
+-          </LinearGradient>
+-
+-          <Text style={styles.subtitle}>Choose when to receive reminders</Text>
+-
+-          <Text style={styles.description}>
+-            We'll send you notifications to take your medications based on your
+-            preferences
+-          </Text>
+-
+-          <View style={styles.toggleContainer}>
+-            <Text style={styles.toggleLabel}>Enable Notifications</Text>
+-            <Switch
+-              trackColor={{ false: '#D1D5DB', true: lightBlue }}
+-              thumbColor={notificationsEnabled ? primaryBlue : '#f4f3f4'}
+-              ios_backgroundColor="#D1D5DB"
+-              onValueChange={() => setNotificationsEnabled(!notificationsEnabled)}
+-              value={notificationsEnabled}
+-            />
+-          </View>
+-
+-          <View style={styles.divider} />
+-
+-          <Text style={styles.sectionTitle}>Reminder Times</Text>
+-
+-          <View style={styles.reminderOptionsList}>
+-            <ReminderOption
+-              icon="weather-sunset-up"
+-              time="Morning"
+-              timeDescription="8:00 AM"
+-              isEnabled={reminderTimes.morning}
+-              onToggle={() => toggleReminderTime('morning')}
+-              disabled={!notificationsEnabled}
+-            />
+-
+-            <ReminderOption
+-              icon="weather-sunny"
+-              time="Afternoon"
+-              timeDescription="12:00 PM"
+-              isEnabled={reminderTimes.afternoon}
+-              onToggle={() => toggleReminderTime('afternoon')}
+-              disabled={!notificationsEnabled}
+-            />
+-
+-            <ReminderOption
+-              icon="weather-sunset-down"
+-              time="Evening"
+-              timeDescription="6:00 PM"
+-              isEnabled={reminderTimes.evening}
+-              onToggle={() => toggleReminderTime('evening')}
+-              disabled={!notificationsEnabled}
+-            />
+-
+-            <ReminderOption
+-              icon="weather-night"
+-              time="Bedtime"
+-              timeDescription="10:00 PM"
+-              isEnabled={reminderTimes.bedtime}
+-              onToggle={() => toggleReminderTime('bedtime')}
+-              disabled={!notificationsEnabled}
+-            />
+-          </View>
+-
+-          <Pressable onPress={handleComplete}>
+-            <LinearGradient
+-              colors={[primaryBlue, primaryTeal] as const}
+-              start={{ x: 0, y: 0 }}
+-              end={{ x: 1, y: 0 }}
+-              style={styles.button}
+-            >
+-              <Text style={styles.buttonText}>Complete Setup</Text>
+-            </LinearGradient>
+-          </Pressable>
+-        </View>
+-      </ScrollView>
+-    </LinearGradient>
+-  );
+-}
+-
+-interface ReminderOptionProps {
+-  icon: string;
+-  time: string;
+-  timeDescription: string;
+-  isEnabled: boolean;
+-  onToggle: () => void;
+-  disabled?: boolean;
+-}
+-
+-function ReminderOption({
+-  icon,
+-  time,
+-  timeDescription,
+-  isEnabled,
+-  onToggle,
+-  disabled = false,
+-}: ReminderOptionProps) {
+-  return (
+-    <View
+-      style={[
+-        styles.reminderOption,
+-        disabled && styles.reminderOptionDisabled,
+-      ]}
+-    >
+-      <View style={styles.reminderOptionLeft}>
+-        <LinearGradient
+-          colors={[primaryBlue, primaryTeal] as const}
+-          style={styles.reminderIconContainer}
+-          start={{ x: 0, y: 0 }}
+-          end={{ x: 1, y: 0 }}
+-        >
+-          <MaterialCommunityIcons name={icon as any} size={24} color={white} />
+-        </LinearGradient>
+-        <View style={styles.reminderOptionText}>
+-          <Text style={styles.reminderTime}>{time}</Text>
+-          <Text style={styles.reminderTimeDescription}>{timeDescription}</Text>
+-        </View>
+-      </View>
+-      <Switch
+-        trackColor={{ false: '#D1D5DB', true: lightBlue }}
+-        thumbColor={isEnabled ? primaryBlue : '#f4f3f4'}
+-        ios_backgroundColor="#D1D5DB"
+-        onValueChange={onToggle}
+-        value={isEnabled}
+-        disabled={disabled}
+-      />
+-    </View>
+-  );
+-}
+-
+-const styles = StyleSheet.create({
+-  scrollView: {
+-    flex: 1,
+-    backgroundColor: 'transparent',
+-  },
+-  container: {
+-    flexGrow: 1,
+-    padding: 20,
+-    paddingBottom: 40,
+-  },
+-  header: {
+-    flexDirection: 'row',
+-    alignItems: 'center',
+-    marginBottom: 20,
+-    borderRadius: 15,
+-    padding: 15,
+-  },
+-  backButton: {
+-    padding: 8,
+-  },
+-  titleContainer: {
+-    flex: 1,
+-    alignItems: 'center',
+-    marginRight: 40,
+-  },
+-  stepText: {
+-    fontSize: 14,
+-    color: white,
+-    marginBottom: 4,
+-  },
+-  title: {
+-    fontSize: 20,
+-    fontWeight: 'bold',
+-    color: white,
+-    textAlign: 'center',
+-  },
+-  card: {
+-    backgroundColor: white,
+-    borderRadius: 20,
+-    padding: 24,
+-    shadowColor: '#000',
+-    shadowOffset: { width: 0, height: 2 },
+-    shadowOpacity: 0.1,
+-    shadowRadius: 8,
+-    elevation: 3,
+-    borderWidth: 1,
+-    borderColor: lightBlue,
+-  },
+-  iconContainer: {
+-    width: 100,
+-    height: 100,
+-    borderRadius: 50,
+-    justifyContent: 'center',
+-    alignItems: 'center',
+-    marginBottom: 24,
+-    alignSelf: 'center',
+-  },
+-  subtitle: {
+-    fontSize: 18,
+-    fontWeight: 'bold',
+-    color: darkBlue,
+-    marginBottom: 12,
+-    textAlign: 'center',
+-  },
+-  description: {
+-    fontSize: 14,
+-    color: darkBlue,
+-    opacity: 0.7,
+-    textAlign: 'center',
+-    marginBottom: 24,
+-  },
+-  toggleContainer: {
+-    flexDirection: 'row',
+-    alignItems: 'center',
+-    justifyContent: 'space-between',
+-    marginBottom: 24,
+-  },
+-  toggleLabel: {
+-    fontSize: 16,
+-    color: darkBlue,
+-  },
+-  divider: {
+-    height: 1,
+-    backgroundColor: lightBlue,
+-    marginBottom: 24,
+-  },
+-  sectionTitle: {
+-    fontSize: 18,
+-    fontWeight: 'bold',
+-    color: darkBlue,
+-    marginBottom: 16,
+-  },
+-  reminderOptionsList: {
+-    marginBottom: 24,
+-  },
+-  reminderOption: {
+-    flexDirection: 'row',
+-    alignItems: 'center',
+-    justifyContent: 'space-between',
+-    paddingVertical: 12,
+-    borderBottomWidth: 1,
+-    borderBottomColor: lightBlue,
+-  },
+-  reminderOptionDisabled: {
+-    opacity: 0.6,
+-  },
+-  reminderOptionLeft: {
+-    flexDirection: 'row',
+-    alignItems: 'center',
+-  },
+-  reminderIconContainer: {
+-    width: 40,
+-    height: 40,
+-    borderRadius: 20,
+-    justifyContent: 'center',
+-    alignItems: 'center',
+-    marginRight: 12,
+-  },
+-  reminderOptionText: {
+-    flex: 1,
+-  },
+-  reminderTime: {
+-    fontSize: 16,
+-    fontWeight: '600',
+-    color: darkBlue,
+-  },
+-  reminderTimeDescription: {
+-    fontSize: 14,
+-    color: darkBlue,
+-    opacity: 0.7,
+-  },
+-  button: {
+-    borderRadius: 25,
+-    paddingVertical: 15,
+-    alignItems: 'center',
+-    marginTop: 8,
+-  },
+-  buttonText: {
+-    color: white,
+-    fontSize: 16,
+-    fontWeight: '600',
+-  },
+-}); 
+\ No newline at end of file
+diff --git a/app/utils/dataManager.ts b/app/utils/dataManager.ts
+new file mode 100644
+index 00000000..84bbc4f0
+--- /dev/null
++++ b/app/utils/dataManager.ts
+@@ -0,0 +1,72 @@
++import * as FileSystem from 'expo-file-system';
++import userData from '../data/userData.json';
++
++// Path to JSON file
++const USER_DATA_FILE = FileSystem.documentDirectory + 'userData.json';
++
++// Initialize by copying the bundled JSON to the file system
++export const initializeUserData = async () => {
++  try {
++    // Check if file exists
++    const fileInfo = await FileSystem.getInfoAsync(USER_DATA_FILE);
++    
++    if (!fileInfo.exists) {
++      // Write initial data from the bundled JSON
++      await FileSystem.writeAsStringAsync(USER_DATA_FILE, JSON.stringify(userData));
++    }
++    return true;
++  } catch (error) {
++    console.error('Error initializing user data:', error);
++    return false;
++  }
++};
++
++// Read user data from file
++export const getUserData = async () => {
++  try {
++    await initializeUserData(); // Make sure data is initialized
++    const fileContent = await FileSystem.readAsStringAsync(USER_DATA_FILE);
++    return JSON.parse(fileContent);
++  } catch (error) {
++    console.error('Error reading user data:', error);
++    // Return the bundled data as fallback
++    return userData;
++  }
++};
++
++// Update medications in user data
++export const updateMedications = async (medications: any[]) => {
++  try {
++    const userData = await getUserData();
++    userData.medications = medications;
++    await FileSystem.writeAsStringAsync(USER_DATA_FILE, JSON.stringify(userData));
++    return true;
++  } catch (error) {
++    console.error('Error updating medications:', error);
++    return false;
++  }
++};
++
++// Update allergies in user data
++export const updateAllergies = async (allergies: any[]) => {
++  try {
++    const userData = await getUserData();
++    userData.allergies = allergies;
++    await FileSystem.writeAsStringAsync(USER_DATA_FILE, JSON.stringify(userData));
++    return true;
++  } catch (error) {
++    console.error('Error updating allergies:', error);
++    return false;
++  }
++};
++
++// Get time options
++export const getTimeOptions = async () => {
++  try {
++    const userData = await getUserData();
++    return userData.timeOptions;
++  } catch (error) {
++    console.error('Error getting time options:', error);
++    return userData.timeOptions; // Return bundled data as fallback
++  }
++}; 
+\ No newline at end of file
+diff --git a/constants/api.ts b/constants/api.ts
+index 40c4e2fa..8a40fa8c 100644
+--- a/constants/api.ts
++++ b/constants/api.ts
+@@ -1 +1 @@
+-export const GOOGLE_API_KEY = "AIzaSyDbOpsAHm3VfEKbw7y46EaQEowi9irNBGw"; 
++export const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY || "YOUR_API_KEY_HERE"; 
+diff --git a/constants/snap-prompt.ts b/constants/snap-prompt.ts
+index 73133b3f..68b624ac 100644
+--- a/constants/snap-prompt.ts
++++ b/constants/snap-prompt.ts
+@@ -1,2 +1,16 @@
+ //TODO: modify to set output format
+-export const SNAP_PROMPT = "You are a health assistant. You are responsible for analyzing this medication and explaining to the user it's name, effects, purpose, dosage, directions of use (IF VISIBLE IN THE PICTURE) and the expiration date(IF VISIBLE IN THE PICTURE). Mention important considerations when using the medication(ex: negative interactions with other medications, potential side effects). Include online reputable medical sources and link them. Add a disclaimer that it is only an AI assistant and should not provide medical advice. Always consult with a qualified healthcare professional for any health concerns or before making any decisions related to your health or treatment.";
+\ No newline at end of file
++export const SNAP_PROMPT = `You are a health assistant. You are responsible for analyzing this medication and explaining to the user it's name, effects, purpose, dosage, directions of use (IF VISIBLE IN THE PICTURE) and the expiration date(IF VISIBLE IN THE PICTURE). Mention important considerations when using the medication(ex: negative interactions with other medications, potential side effects). Add a disclaimer that it is only an AI assistant and should not provide medical advice. Always consult with a qualified healthcare professional for any health concerns or before making any decisions related to your health or treatment.
++
++RETURN YOUR RESPONSE IN THE FOLLOWING JSON FORMAT ONLY:
++{
++  "medication_name": "Name of the medication",
++  "purpose": "Primary reason or condition the medication is used for",
++  "effects": "How the medication works and its intended effects on the body",
++  "typical_dosage": "Common dosage information for the medication",
++  "directions_of_use": "Instructions on how to take the medication (only if visible/provided)",
++  "expiration_date": "The expiration date of the specific medication package (only if visible/provided)",
++  "important_considerations": "Key warnings, potential side effects, drug interactions, and other important points",
++  "disclaimer": "Standard disclaimer stating the AI nature and advising consultation with a healthcare professional"
++}
++
++Do not include any text outside the JSON format.`;
+\ No newline at end of file
+diff --git a/node_modules/.bin/uuid b/node_modules/.bin/uuid
+index 588f70ec..80eb14aa 120000
+--- a/node_modules/.bin/uuid
++++ b/node_modules/.bin/uuid
+@@ -1 +1 @@
+-../uuid/dist/bin/uuid
+\ No newline at end of file
++../node-uuid/bin/uuid
+\ No newline at end of file
+diff --git a/node_modules/.package-lock.json b/node_modules/.package-lock.json
+index 80e47e65..55d0d71d 100644
+--- a/node_modules/.package-lock.json
++++ b/node_modules/.package-lock.json
+@@ -3525,6 +3525,28 @@
+         "react": "^16.8 || ^17.0 || ^18.0"
+       }
+     },
++    "node_modules/@react-native-community/datetimepicker": {
++      "version": "8.3.0",
++      "resolved": "https://registry.npmjs.org/@react-native-community/datetimepicker/-/datetimepicker-8.3.0.tgz",
++      "integrity": "sha512-K/KgaJbLtjMpx4PaG4efrVIcSe6+DbLufeX1lwPB5YY8i3sq9dOh6WcAcMTLbaRTUpurebQTkl7puHPFm9GalA==",
++      "dependencies": {
++        "invariant": "^2.2.4"
++      },
++      "peerDependencies": {
++        "expo": ">=50.0.0",
++        "react": "*",
++        "react-native": "*",
++        "react-native-windows": "*"
++      },
++      "peerDependenciesMeta": {
++        "expo": {
++          "optional": true
++        },
++        "react-native-windows": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/@react-native/assets-registry": {
+       "version": "0.76.7",
+       "resolved": "https://registry.npmjs.org/@react-native/assets-registry/-/assets-registry-0.76.7.tgz",
+@@ -4799,6 +4821,22 @@
+       "integrity": "sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==",
+       "license": "MIT"
+     },
++    "node_modules/asn1": {
++      "version": "0.1.11",
++      "resolved": "https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz",
++      "integrity": "sha512-Fh9zh3G2mZ8qM/kwsiKwL2U2FmXxVsboP4x1mXjnhKHv3SmzaBZoYvxEQJz/YS2gnCgd8xlAVWcZnQyC9qZBsA==",
++      "engines": {
++        "node": ">=0.4.9"
++      }
++    },
++    "node_modules/assert-plus": {
++      "version": "0.1.5",
++      "resolved": "https://registry.npmjs.org/assert-plus/-/assert-plus-0.1.5.tgz",
++      "integrity": "sha512-brU24g7ryhRwGCI2y+1dGQmQXiZF7TtIj583S96y0jjdajIe6wn8BuXyELYhvD22dtIxDQVFk04YTJwwdwOYJw==",
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
+     "node_modules/ast-types": {
+       "version": "0.15.2",
+       "resolved": "https://registry.npmjs.org/ast-types/-/ast-types-0.15.2.tgz",
+@@ -4811,6 +4849,14 @@
+         "node": ">=4"
+       }
+     },
++    "node_modules/async": {
++      "version": "0.1.22",
++      "resolved": "https://registry.npmjs.org/async/-/async-0.1.22.tgz",
++      "integrity": "sha512-2tEzliJmf5fHNafNwQLJXUasGzQCVctvsNkXmnlELHwypU0p08/rHohYvkqKIjyXpx+0rkrYv6QbhJ+UF4QkBg==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/async-limiter": {
+       "version": "1.0.1",
+       "resolved": "https://registry.npmjs.org/async-limiter/-/async-limiter-1.0.1.tgz",
+@@ -4832,6 +4878,14 @@
+         "node": ">= 4.0.0"
+       }
+     },
++    "node_modules/aws-sign": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/aws-sign/-/aws-sign-0.3.0.tgz",
++      "integrity": "sha512-pEMJAknifcXqXqYVXzGPIu8mJvxtJxIdpVpAs8HNS+paT+9srRUDMQn+3hULS7WbLmttcmvgMvnDcFujqXJyPw==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/babel-core": {
+       "version": "7.0.0-bridge.0",
+       "resolved": "https://registry.npmjs.org/babel-core/-/babel-core-7.0.0-bridge.0.tgz",
+@@ -5113,6 +5167,27 @@
+         "url": "https://github.com/sponsors/sindresorhus"
+       }
+     },
++    "node_modules/bfg": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/bfg/-/bfg-0.3.0.tgz",
++      "integrity": "sha512-ONjB4wuXKTdwEzqf5Xzd0CSkPAJuISB7JQozKG0g61c70YeG05o3mdyAKGlIhcNGHarOPemZCljJxOomTo6pCw==",
++      "dependencies": {
++        "busboy": "~0.2.3",
++        "commander": "~2.1.0",
++        "pkgcloud": "~0.9.4"
++      },
++      "bin": {
++        "bfg": "src/cli.js"
++      }
++    },
++    "node_modules/bfg/node_modules/commander": {
++      "version": "2.1.0",
++      "resolved": "https://registry.npmjs.org/commander/-/commander-2.1.0.tgz",
++      "integrity": "sha512-J2wnb6TKniXNOtoHS8TSrG9IOQluPrsmyAJ8oCUJOBmv+uLBCyPYAZkD2jFvw2DCzIXNnISIM01NIvr35TkBMQ==",
++      "engines": {
++        "node": ">= 0.6.x"
++      }
++    },
+     "node_modules/big-integer": {
+       "version": "1.6.52",
+       "resolved": "https://registry.npmjs.org/big-integer/-/big-integer-1.6.52.tgz",
+@@ -5189,6 +5264,27 @@
+         "node": ">= 0.8"
+       }
+     },
++    "node_modules/boom": {
++      "version": "0.4.2",
++      "resolved": "https://registry.npmjs.org/boom/-/boom-0.4.2.tgz",
++      "integrity": "sha512-OvfN8y1oAxxphzkl2SnCS+ztV/uVKTATtgLjWYg/7KwcNyf3rzpHxNQJZCKtsZd4+MteKczhWbSjtEX4bGgU9g==",
++      "deprecated": "This version has been deprecated in accordance with the hapi support policy (hapi.im/support). Please upgrade to the latest version to get the best features, bug fixes, and security patches. If you are unable to upgrade at this time, paid support is available for older versions (hapi.im/commercial).",
++      "dependencies": {
++        "hoek": "0.9.x"
++      },
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
++    "node_modules/boom/node_modules/hoek": {
++      "version": "0.9.1",
++      "resolved": "https://registry.npmjs.org/hoek/-/hoek-0.9.1.tgz",
++      "integrity": "sha512-ZZ6eGyzGjyMTmpSPYVECXy9uNfqBR7x5CavhUaLOeD6W0vWK1mp/b7O3f86XE0Mtfo9rZ6Bh3fnuw9Xr8MF9zA==",
++      "deprecated": "This version has been deprecated in accordance with the hapi support policy (hapi.im/support). Please upgrade to the latest version to get the best features, bug fixes, and security patches. If you are unable to upgrade at this time, paid support is available for older versions (hapi.im/commercial).",
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/bplist-creator": {
+       "version": "0.0.7",
+       "resolved": "https://registry.npmjs.org/bplist-creator/-/bplist-creator-0.0.7.tgz",
+@@ -5330,6 +5426,18 @@
+       "integrity": "sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==",
+       "license": "MIT"
+     },
++    "node_modules/busboy": {
++      "version": "0.2.14",
++      "resolved": "https://registry.npmjs.org/busboy/-/busboy-0.2.14.tgz",
++      "integrity": "sha512-InWFDomvlkEj+xWLBfU3AvnbVYqeTWmQopiW0tWWEy5yehYm2YkGEc59sUmw/4ty5Zj/b0WHGs1LgecuBSBGrg==",
++      "dependencies": {
++        "dicer": "0.2.5",
++        "readable-stream": "1.1.x"
++      },
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/bytes": {
+       "version": "3.1.2",
+       "resolved": "https://registry.npmjs.org/bytes/-/bytes-3.1.2.tgz",
+@@ -5921,6 +6029,14 @@
+         "node": ">= 0.6"
+       }
+     },
++    "node_modules/cookie-jar": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/cookie-jar/-/cookie-jar-0.3.0.tgz",
++      "integrity": "sha512-dX1400pzPULr+ZovkIsDEqe7XH8xCAYGT5Dege4Eot44Qs2mS2iJmnh45TxTO5MIsCfrV/JGZVloLhm46AHxNw==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/cookie-signature": {
+       "version": "1.0.6",
+       "resolved": "https://registry.npmjs.org/cookie-signature/-/cookie-signature-1.0.6.tgz",
+@@ -5939,6 +6055,11 @@
+         "url": "https://opencollective.com/core-js"
+       }
+     },
++    "node_modules/core-util-is": {
++      "version": "1.0.3",
++      "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.3.tgz",
++      "integrity": "sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ=="
++    },
+     "node_modules/cosmiconfig": {
+       "version": "5.2.1",
+       "resolved": "https://registry.npmjs.org/cosmiconfig/-/cosmiconfig-5.2.1.tgz",
+@@ -6021,6 +6142,18 @@
+         "node": "*"
+       }
+     },
++    "node_modules/cryptiles": {
++      "version": "0.2.2",
++      "resolved": "https://registry.npmjs.org/cryptiles/-/cryptiles-0.2.2.tgz",
++      "integrity": "sha512-gvWSbgqP+569DdslUiCelxIv3IYK5Lgmq1UrRnk+s1WxQOQ16j3GPDcjdtgL5Au65DU/xQi6q3xPtf5Kta+3IQ==",
++      "deprecated": "This version has been deprecated in accordance with the hapi support policy (hapi.im/support). Please upgrade to the latest version to get the best features, bug fixes, and security patches. If you are unable to upgrade at this time, paid support is available for older versions (hapi.im/commercial).",
++      "dependencies": {
++        "boom": "0.4.x"
++      },
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/crypto-random-string": {
+       "version": "2.0.0",
+       "resolved": "https://registry.npmjs.org/crypto-random-string/-/crypto-random-string-2.0.0.tgz",
+@@ -6073,6 +6206,14 @@
+       "devOptional": true,
+       "license": "MIT"
+     },
++    "node_modules/ctype": {
++      "version": "0.5.3",
++      "resolved": "https://registry.npmjs.org/ctype/-/ctype-0.5.3.tgz",
++      "integrity": "sha512-T6CEkoSV4q50zW3TlTHMbzy1E5+zlnNcY+yb7tWVYlTwPhx9LpnfAkd4wecpWknDyptp4k97LUZeInlf6jdzBg==",
++      "engines": {
++        "node": ">= 0.4"
++      }
++    },
+     "node_modules/data-urls": {
+       "version": "3.0.2",
+       "resolved": "https://registry.npmjs.org/data-urls/-/data-urls-3.0.2.tgz",
+@@ -6136,6 +6277,11 @@
+         }
+       }
+     },
++    "node_modules/deep-equal": {
++      "version": "0.2.2",
++      "resolved": "https://registry.npmjs.org/deep-equal/-/deep-equal-0.2.2.tgz",
++      "integrity": "sha512-FXgye2Jr6oEk01S7gmSrHrPEQ1ontR7wwl+nYiZ8h4SXlHVm0DYda74BIPcHz2s2qPz4+375IcAz1vsWLwddgQ=="
++    },
+     "node_modules/deep-extend": {
+       "version": "0.6.0",
+       "resolved": "https://registry.npmjs.org/deep-extend/-/deep-extend-0.6.0.tgz",
+@@ -6260,6 +6406,18 @@
+         "node": ">=8"
+       }
+     },
++    "node_modules/dicer": {
++      "version": "0.2.5",
++      "resolved": "https://registry.npmjs.org/dicer/-/dicer-0.2.5.tgz",
++      "integrity": "sha512-FDvbtnq7dzlPz0wyYlOExifDEZcu8h+rErEXgfxqmLfRfC/kJidEFh4+effJRO3P0xmfqyPbSMG0LveNRfTKVg==",
++      "dependencies": {
++        "readable-stream": "1.1.x",
++        "streamsearch": "0.1.2"
++      },
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/diff-sequences": {
+       "version": "29.6.3",
+       "resolved": "https://registry.npmjs.org/diff-sequences/-/diff-sequences-29.6.3.tgz",
+@@ -6461,6 +6619,14 @@
+         "stackframe": "^1.3.4"
+       }
+     },
++    "node_modules/errs": {
++      "version": "0.2.4",
++      "resolved": "https://registry.npmjs.org/errs/-/errs-0.2.4.tgz",
++      "integrity": "sha512-btTuvM73tHesc12VR/AcJW42s4pUOtXXjufHQIwlv80kvtBFjNBj52fs5+rrU7onVlI1kFoT+b/rBAbEaq+z2Q==",
++      "engines": {
++        "node": ">= 0.4.0"
++      }
++    },
+     "node_modules/es-define-property": {
+       "version": "1.0.1",
+       "resolved": "https://registry.npmjs.org/es-define-property/-/es-define-property-1.0.1.tgz",
+@@ -6653,6 +6819,11 @@
+         "node": ">=6"
+       }
+     },
++    "node_modules/eventemitter2": {
++      "version": "0.4.14",
++      "resolved": "https://registry.npmjs.org/eventemitter2/-/eventemitter2-0.4.14.tgz",
++      "integrity": "sha512-K7J4xq5xAD5jHsGM5ReWXRTFa3JRGofHiMcVgQ8PRwgWxzjHpMWCIzsmyf60+mh8KLsqYPcjUMa0AC4hd6lPyQ=="
++    },
+     "node_modules/eventemitter3": {
+       "version": "5.0.1",
+       "resolved": "https://registry.npmjs.org/eventemitter3/-/eventemitter3-5.0.1.tgz",
+@@ -6889,7 +7060,6 @@
+       "version": "16.0.18",
+       "resolved": "https://registry.npmjs.org/expo-camera/-/expo-camera-16.0.18.tgz",
+       "integrity": "sha512-NP5u2yyc+wZc9GdUXH+jcEytyXZwBnHxItMwXoZQQxi4wgltwvs4XfSWjBtRZe1LngnhpBfPyPJV0aShjWlLDg==",
+-      "license": "MIT",
+       "dependencies": {
+         "invariant": "^2.2.4"
+       },
+@@ -7446,6 +7616,14 @@
+       "integrity": "sha512-e6eB7zN6UBSwGVwrbWVH+gdLnkW9WwHhmq2YDK1Sh30pzx1onRVGBvogTlUeWxwTa+L86NYdo4hFkh7O8ZjSnA==",
+       "license": "MIT"
+     },
++    "node_modules/filed": {
++      "version": "0.0.7",
++      "resolved": "https://registry.npmjs.org/filed/-/filed-0.0.7.tgz",
++      "integrity": "sha512-5ET8UDrcysKn9+v/Fq6pUi31XaHLnI5QiMdfothtGFtR9GUMA5KxNmqrSQEk2TIOe1TJU7tLlJxqUDXCM/ICWQ==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/fill-range": {
+       "version": "7.1.1",
+       "resolved": "https://registry.npmjs.org/fill-range/-/fill-range-7.1.1.tgz",
+@@ -7662,6 +7840,14 @@
+         "url": "https://github.com/sponsors/isaacs"
+       }
+     },
++    "node_modules/forever-agent": {
++      "version": "0.5.2",
++      "resolved": "https://registry.npmjs.org/forever-agent/-/forever-agent-0.5.2.tgz",
++      "integrity": "sha512-PDG5Ef0Dob/JsZUxUltJOhm/Y9mlteAE+46y3M9RBz/Rd3QVENJ75aGRhN56yekTUboaBIkd8KVWX2NjF6+91A==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/form-data": {
+       "version": "3.0.3",
+       "resolved": "https://registry.npmjs.org/form-data/-/form-data-3.0.3.tgz",
+@@ -8127,6 +8313,21 @@
+         "node": ">= 0.4"
+       }
+     },
++    "node_modules/hawk": {
++      "version": "0.13.1",
++      "resolved": "https://registry.npmjs.org/hawk/-/hawk-0.13.1.tgz",
++      "integrity": "sha512-f/1H9bruKJfgLN2KFd+666ILQvJYsJcxaCoIdHaaD2zgl7RUa08/202pGJXhOmQ1kTEdMTSxPnbCsu4l6JARhQ==",
++      "deprecated": "This module moved to @hapi/hawk. Please make sure to switch over as this distribution is no longer supported and may contain bugs and critical security issues.",
++      "dependencies": {
++        "boom": "0.4.x",
++        "cryptiles": "0.2.x",
++        "hoek": "0.8.x",
++        "sntp": "0.2.x"
++      },
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/hermes-estree": {
+       "version": "0.23.1",
+       "resolved": "https://registry.npmjs.org/hermes-estree/-/hermes-estree-0.23.1.tgz",
+@@ -8142,6 +8343,15 @@
+         "hermes-estree": "0.23.1"
+       }
+     },
++    "node_modules/hoek": {
++      "version": "0.8.5",
++      "resolved": "https://registry.npmjs.org/hoek/-/hoek-0.8.5.tgz",
++      "integrity": "sha512-NoKdeYUBOlQ7j9dgvT9BEX90rE6HtDkaMFwR6hfOj26LA2Mwyg5026jOpNBhmNrWIGdPnbBK3sQJI3POwh8wqg==",
++      "deprecated": "This version has been deprecated in accordance with the hapi support policy (hapi.im/support). Please upgrade to the latest version to get the best features, bug fixes, and security patches. If you are unable to upgrade at this time, paid support is available for older versions (hapi.im/commercial).",
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/hoist-non-react-statics": {
+       "version": "3.3.2",
+       "resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
+@@ -8235,6 +8445,19 @@
+         "node": ">= 6"
+       }
+     },
++    "node_modules/http-signature": {
++      "version": "0.10.1",
++      "resolved": "https://registry.npmjs.org/http-signature/-/http-signature-0.10.1.tgz",
++      "integrity": "sha512-coK8uR5rq2IMj+Hen+sKPA5ldgbCc1/spPdKCL1Fw6h+D0s/2LzMcRK0Cqufs1h0ryx/niwBHGFu8HC3hwU+lA==",
++      "dependencies": {
++        "asn1": "0.1.11",
++        "assert-plus": "^0.1.5",
++        "ctype": "0.5.3"
++      },
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
+     "node_modules/https-proxy-agent": {
+       "version": "5.0.1",
+       "resolved": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-5.0.1.tgz",
+@@ -8264,6 +8487,14 @@
+       "integrity": "sha512-WDC/ui2VVRrz3jOVi+XtjqkDjiVjTtFaAGiW37k6b+ohyQ5wYDOGkvCZa8+H0nx3gyvv0+BST9xuOgIyGQ00gw==",
+       "license": "BSD-3-Clause"
+     },
++    "node_modules/i": {
++      "version": "0.3.7",
++      "resolved": "https://registry.npmjs.org/i/-/i-0.3.7.tgz",
++      "integrity": "sha512-FYz4wlXgkQwIPqhzC5TdNMLSE5+GS1IIDJZY/1ZiEPCT2S3COUVZeT5OW4BmW4r5LHLQuOosSwsvnroG9GR59Q==",
++      "engines": {
++        "node": ">=0.4"
++      }
++    },
+     "node_modules/iconv-lite": {
+       "version": "0.6.3",
+       "resolved": "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz",
+@@ -8436,6 +8667,11 @@
+         "loose-envify": "^1.0.0"
+       }
+     },
++    "node_modules/ip": {
++      "version": "0.0.5",
++      "resolved": "https://registry.npmjs.org/ip/-/ip-0.0.5.tgz",
++      "integrity": "sha512-v0CtD+JtdBqc2ola3KMeZ1ohE20QJQOGg50lpmg73nqe/8Ocx6RQ8A0SrEsNmCoXvSldMPrWgCvfUqJJIRr79Q=="
++    },
+     "node_modules/ip-regex": {
+       "version": "2.1.0",
+       "resolved": "https://registry.npmjs.org/ip-regex/-/ip-regex-2.1.0.tgz",
+@@ -8612,6 +8848,11 @@
+         "node": ">=8"
+       }
+     },
++    "node_modules/isarray": {
++      "version": "0.0.1",
++      "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz",
++      "integrity": "sha512-D2S+3GLxWH+uhrNEcoh/fnmYeP8E8/zHl644d/jdA0g2uyXvy3sb0qxotE+ne0LtccHknQzWwZEzhak7oJ0COQ=="
++    },
+     "node_modules/isexe": {
+       "version": "2.0.0",
+       "resolved": "https://registry.npmjs.org/isexe/-/isexe-2.0.0.tgz",
+@@ -9865,6 +10106,11 @@
+       "integrity": "sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==",
+       "license": "MIT"
+     },
++    "node_modules/json-stringify-safe": {
++      "version": "4.0.0",
++      "resolved": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-4.0.0.tgz",
++      "integrity": "sha512-qzEpz1SDUb9xvA+LDOkNgjekdV7tuC7zDQf14sqMBtujh8kVbQhF11VWm4DeR99yFNjVSjTTfKa40c9ZQOtwXA=="
++    },
+     "node_modules/json5": {
+       "version": "2.2.3",
+       "resolved": "https://registry.npmjs.org/json5/-/json5-2.2.3.tgz",
+@@ -10007,6 +10253,26 @@
+         "url": "https://opencollective.com/parcel"
+       }
+     },
++    "node_modules/lightningcss-darwin-x64": {
++      "version": "1.27.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-darwin-x64/-/lightningcss-darwin-x64-1.27.0.tgz",
++      "integrity": "sha512-0+mZa54IlcNAoQS9E0+niovhyjjQWEMrwW0p2sSdLRhLDc8LMQ/b67z7+B5q4VmjYCMSfnFi3djAAQFIDuj/Tg==",
++      "cpu": [
++        "x64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "darwin"
++      ],
++      "engines": {
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
++      }
++    },
+     "node_modules/lines-and-columns": {
+       "version": "1.2.4",
+       "resolved": "https://registry.npmjs.org/lines-and-columns/-/lines-and-columns-1.2.4.tgz",
+@@ -10930,6 +11196,14 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/ncp": {
++      "version": "1.0.1",
++      "resolved": "https://registry.npmjs.org/ncp/-/ncp-1.0.1.tgz",
++      "integrity": "sha512-akBX7I5X9KQDDWmYYgQlLbVbjkveTje2mioZjhLLrVt09akSZcoqXWE5LEn1E2fu8T7th1PZYGfewQsTkTLTmQ==",
++      "bin": {
++        "ncp": "bin/ncp"
++      }
++    },
+     "node_modules/negotiator": {
+       "version": "0.6.3",
+       "resolved": "https://registry.npmjs.org/negotiator/-/negotiator-0.6.3.tgz",
+@@ -11032,6 +11306,15 @@
+       "integrity": "sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==",
+       "license": "MIT"
+     },
++    "node_modules/node-uuid": {
++      "version": "1.4.8",
++      "resolved": "https://registry.npmjs.org/node-uuid/-/node-uuid-1.4.8.tgz",
++      "integrity": "sha512-TkCET/3rr9mUuRp+CpO7qfgT++aAxfDRaalQhwPFzI9BY/2rCDn6OfpZOVggi1AXfTPpfkTrg5f5WQx5G1uLxA==",
++      "deprecated": "Use uuid module instead",
++      "bin": {
++        "uuid": "bin/uuid"
++      }
++    },
+     "node_modules/normalize-path": {
+       "version": "3.0.0",
+       "resolved": "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz",
+@@ -11102,6 +11385,14 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/oauth-sign": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/oauth-sign/-/oauth-sign-0.3.0.tgz",
++      "integrity": "sha512-Tr31Sh5FnK9YKm7xTUPyDMsNOvMqkVDND0zvK/Wgj7/H9q8mpye0qG2nVzrnsvLhcsX5DtqXD0la0ks6rkPCGQ==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/ob1": {
+       "version": "0.81.4",
+       "resolved": "https://registry.npmjs.org/ob1/-/ob1-0.81.4.tgz",
+@@ -11616,6 +11907,62 @@
+         "node": ">=8"
+       }
+     },
++    "node_modules/pkgcloud": {
++      "version": "0.9.6",
++      "resolved": "https://registry.npmjs.org/pkgcloud/-/pkgcloud-0.9.6.tgz",
++      "integrity": "sha512-L/yFApX/oJLLwQYm2PEceWZhyQa9N3Pgk16BlwXaU2SjOtxcEEpyWKtslhzkyvc+2wWg6MJkhsRGyYI0Nsf15w==",
++      "dependencies": {
++        "async": "0.1.x",
++        "errs": "0.2.x",
++        "eventemitter2": "0.4.x",
++        "filed": "0.0.7",
++        "ip": "0.0.x",
++        "mime": "1.2.x",
++        "pkginfo": "0.2.x",
++        "qs": "0.6.x",
++        "request": "2.22.x",
++        "through": "~2.3",
++        "underscore": "1.4.x",
++        "url-join": "0.0.x",
++        "utile": "0.x.x",
++        "xml2js": "0.1.x"
++      },
++      "engines": {
++        "node": "0.8.x || 0.10.x"
++      }
++    },
++    "node_modules/pkgcloud/node_modules/mime": {
++      "version": "1.2.11",
++      "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz",
++      "integrity": "sha512-Ysa2F/nqTNGHhhm9MV8ure4+Hc+Y8AWiqUdHxsO7xu8zc92ND9f3kpALHjaP026Ft17UfxrMt95c50PLUeynBw=="
++    },
++    "node_modules/pkgcloud/node_modules/qs": {
++      "version": "0.6.6",
++      "resolved": "https://registry.npmjs.org/qs/-/qs-0.6.6.tgz",
++      "integrity": "sha512-kN+yNdAf29Jgp+AYHUmC7X4QdJPR8czuMWLNLc0aRxkQ7tB3vJQEONKKT9ou/rW7EbqVec11srC9q9BiVbcnHA==",
++      "engines": {
++        "node": "*"
++      }
++    },
++    "node_modules/pkgcloud/node_modules/xml2js": {
++      "version": "0.1.14",
++      "resolved": "https://registry.npmjs.org/xml2js/-/xml2js-0.1.14.tgz",
++      "integrity": "sha512-pbdws4PPPNc1HPluSUKamY4GWMk592K7qwcj6BExbVOhhubub8+pMda/ql68b6L3luZs/OGjGSB5goV7SnmgnA==",
++      "dependencies": {
++        "sax": ">=0.1.1"
++      },
++      "engines": {
++        "node": "*"
++      }
++    },
++    "node_modules/pkginfo": {
++      "version": "0.2.3",
++      "resolved": "https://registry.npmjs.org/pkginfo/-/pkginfo-0.2.3.tgz",
++      "integrity": "sha512-7W7wTrE/NsY8xv/DTGjwNIyNah81EQH0MWcTzrHL6pOpMocOGZc0Mbdz9aXxSrp+U0mSmkU8jrNCDCfUs3sOBg==",
++      "engines": {
++        "node": ">= 0.4.0"
++      }
++    },
+     "node_modules/plist": {
+       "version": "3.1.0",
+       "resolved": "https://registry.npmjs.org/plist/-/plist-3.1.0.tgz",
+@@ -12418,6 +12765,17 @@
+         "react": "^18.3.1"
+       }
+     },
++    "node_modules/readable-stream": {
++      "version": "1.1.14",
++      "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.1.14.tgz",
++      "integrity": "sha512-+MeVjFf4L44XUkhM1eYbD8fyEsxcV81pqMSR5gblfcLCHfZvbrqy4/qYHE+/R5HoBUT11WV5O08Cr1n3YXkWVQ==",
++      "dependencies": {
++        "core-util-is": "~1.0.0",
++        "inherits": "~2.0.1",
++        "isarray": "0.0.1",
++        "string_decoder": "~0.10.x"
++      }
++    },
+     "node_modules/readline": {
+       "version": "1.3.0",
+       "resolved": "https://registry.npmjs.org/readline/-/readline-1.3.0.tgz",
+@@ -12525,6 +12883,79 @@
+       "integrity": "sha512-o4S4Qh6L2jpnCy83ysZDau+VORNvnFw07CKSAymkd6ICNVEPisMyzlc00KlvvicsxKck94SEwhDnMNdICzO+tA==",
+       "license": "MIT"
+     },
++    "node_modules/request": {
++      "version": "2.22.0",
++      "resolved": "https://registry.npmjs.org/request/-/request-2.22.0.tgz",
++      "integrity": "sha512-s05oCBjWuzNi/UbZtvwOnSJ85/lHUdYPriJyFUwdxHKr8VcZHB0wx0eTX8y5hCH3p7OTDi9iQUqMFyDkW6K7EQ==",
++      "deprecated": "request has been deprecated, see https://github.com/request/request/issues/3142",
++      "engines": [
++        "node >= 0.8.0"
++      ],
++      "dependencies": {
++        "aws-sign": "~0.3.0",
++        "cookie-jar": "~0.3.0",
++        "forever-agent": "~0.5.0",
++        "form-data": "0.0.8",
++        "hawk": "~0.13.0",
++        "http-signature": "~0.10.0",
++        "json-stringify-safe": "~4.0.0",
++        "mime": "~1.2.9",
++        "node-uuid": "~1.4.0",
++        "oauth-sign": "~0.3.0",
++        "qs": "~0.6.0",
++        "tunnel-agent": "~0.3.0"
++      }
++    },
++    "node_modules/request/node_modules/async": {
++      "version": "0.2.10",
++      "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz",
++      "integrity": "sha512-eAkdoKxU6/LkKDBzLpT+t6Ff5EtfSF4wx1WfJiPEEV7WNLnDaRXk0oVysiEPm262roaachGexwUv94WhSgN5TQ=="
++    },
++    "node_modules/request/node_modules/combined-stream": {
++      "version": "0.0.7",
++      "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-0.0.7.tgz",
++      "integrity": "sha512-qfexlmLp9MyrkajQVyjEDb0Vj+KhRgR/rxLiVhaihlT+ZkX0lReqtH6Ack40CvMDERR4b5eFp3CreskpBs1Pig==",
++      "dependencies": {
++        "delayed-stream": "0.0.5"
++      },
++      "engines": {
++        "node": ">= 0.8"
++      }
++    },
++    "node_modules/request/node_modules/delayed-stream": {
++      "version": "0.0.5",
++      "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz",
++      "integrity": "sha512-v+7uBd1pqe5YtgPacIIbZ8HuHeLFVNe4mUEyFDXL6KiqzEykjbw+5mXZXpGFgNVasdL4jWKgaKIXrEHiynN1LA==",
++      "engines": {
++        "node": ">=0.4.0"
++      }
++    },
++    "node_modules/request/node_modules/form-data": {
++      "version": "0.0.8",
++      "resolved": "https://registry.npmjs.org/form-data/-/form-data-0.0.8.tgz",
++      "integrity": "sha512-yzpBIhe8Ll+dYTXjd+4ORxbQktke+abD0dJjedvqsVVayMkb+PgLGatJNLwo95Va75l3YDZ01SrouzyW9bC2Fg==",
++      "dependencies": {
++        "async": "~0.2.7",
++        "combined-stream": "~0.0.4",
++        "mime": "~1.2.2"
++      },
++      "engines": {
++        "node": ">= 0.6"
++      }
++    },
++    "node_modules/request/node_modules/mime": {
++      "version": "1.2.11",
++      "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz",
++      "integrity": "sha512-Ysa2F/nqTNGHhhm9MV8ure4+Hc+Y8AWiqUdHxsO7xu8zc92ND9f3kpALHjaP026Ft17UfxrMt95c50PLUeynBw=="
++    },
++    "node_modules/request/node_modules/qs": {
++      "version": "0.6.6",
++      "resolved": "https://registry.npmjs.org/qs/-/qs-0.6.6.tgz",
++      "integrity": "sha512-kN+yNdAf29Jgp+AYHUmC7X4QdJPR8czuMWLNLc0aRxkQ7tB3vJQEONKKT9ou/rW7EbqVec11srC9q9BiVbcnHA==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/require-directory": {
+       "version": "2.1.1",
+       "resolved": "https://registry.npmjs.org/require-directory/-/require-directory-2.1.1.tgz",
+@@ -13224,6 +13655,27 @@
+         "node": ">=8.0.0"
+       }
+     },
++    "node_modules/sntp": {
++      "version": "0.2.4",
++      "resolved": "https://registry.npmjs.org/sntp/-/sntp-0.2.4.tgz",
++      "integrity": "sha512-bDLrKa/ywz65gCl+LmOiIhteP1bhEsAAzhfMedPoiHP3dyYnAevlaJshdqb9Yu0sRifyP/fRqSt8t+5qGIWlGQ==",
++      "deprecated": "This module moved to @hapi/sntp. Please make sure to switch over as this distribution is no longer supported and may contain bugs and critical security issues.",
++      "dependencies": {
++        "hoek": "0.9.x"
++      },
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
++    "node_modules/sntp/node_modules/hoek": {
++      "version": "0.9.1",
++      "resolved": "https://registry.npmjs.org/hoek/-/hoek-0.9.1.tgz",
++      "integrity": "sha512-ZZ6eGyzGjyMTmpSPYVECXy9uNfqBR7x5CavhUaLOeD6W0vWK1mp/b7O3f86XE0Mtfo9rZ6Bh3fnuw9Xr8MF9zA==",
++      "deprecated": "This version has been deprecated in accordance with the hapi support policy (hapi.im/support). Please upgrade to the latest version to get the best features, bug fixes, and security patches. If you are unable to upgrade at this time, paid support is available for older versions (hapi.im/commercial).",
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/source-map": {
+       "version": "0.6.1",
+       "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz",
+@@ -13400,6 +13852,14 @@
+         "node": ">= 0.10.0"
+       }
+     },
++    "node_modules/streamsearch": {
++      "version": "0.1.2",
++      "resolved": "https://registry.npmjs.org/streamsearch/-/streamsearch-0.1.2.tgz",
++      "integrity": "sha512-jos8u++JKm0ARcSUTAZXOVC0mSox7Bhn6sBgty73P1f3JGf7yG2clTbBNHUdde/kdvP2FESam+vM6l8jBrNxHA==",
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/strict-uri-encode": {
+       "version": "2.0.0",
+       "resolved": "https://registry.npmjs.org/strict-uri-encode/-/strict-uri-encode-2.0.0.tgz",
+@@ -13409,6 +13869,11 @@
+         "node": ">=4"
+       }
+     },
++    "node_modules/string_decoder": {
++      "version": "0.10.31",
++      "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz",
++      "integrity": "sha512-ev2QzSzWPYmy9GuqfIVildA4OdcGLeFZQrq5ys6RtiuF+RQQiZWr8TZNyAcuVXyQRYfEO+MsoB/1BuQVhOJuoQ=="
++    },
+     "node_modules/string-length": {
+       "version": "4.0.2",
+       "resolved": "https://registry.npmjs.org/string-length/-/string-length-4.0.2.tgz",
+@@ -14105,6 +14570,14 @@
+       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",
+       "license": "0BSD"
+     },
++    "node_modules/tunnel-agent": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.3.0.tgz",
++      "integrity": "sha512-jlGqHGoKzyyjhwv/c9omAgohntThMcGtw8RV/RDLlkbbc08kni/akVxO62N8HaXMVbVsK1NCnpSK3N2xCt22ww==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/type-detect": {
+       "version": "4.0.8",
+       "resolved": "https://registry.npmjs.org/type-detect/-/type-detect-4.0.8.tgz",
+@@ -14178,6 +14651,11 @@
+         "node": "*"
+       }
+     },
++    "node_modules/underscore": {
++      "version": "1.4.4",
++      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.4.4.tgz",
++      "integrity": "sha512-ZqGrAgaqqZM7LGRzNjLnw5elevWb5M8LEoDMadxIW3OWbcv72wMMgKdwOKpd5Fqxe8choLD8HN3iSj3TUh/giQ=="
++    },
+     "node_modules/undici": {
+       "version": "6.21.2",
+       "resolved": "https://registry.npmjs.org/undici/-/undici-6.21.2.tgz",
+@@ -14317,6 +14795,11 @@
+         "browserslist": ">= 4.21.0"
+       }
+     },
++    "node_modules/url-join": {
++      "version": "0.0.1",
++      "resolved": "https://registry.npmjs.org/url-join/-/url-join-0.0.1.tgz",
++      "integrity": "sha512-H6dnQ/yPAAVzMQRvEvyz01hhfQL5qRWSEt7BX8t9DqnPw9BjMb64fjIRq76Uvf1hkHp+mTZvEVJ5guXOT0Xqaw=="
++    },
+     "node_modules/url-parse": {
+       "version": "1.5.10",
+       "resolved": "https://registry.npmjs.org/url-parse/-/url-parse-1.5.10.tgz",
+@@ -14346,6 +14829,59 @@
+         "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+       }
+     },
++    "node_modules/utile": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/utile/-/utile-0.3.0.tgz",
++      "integrity": "sha512-KaciY16ate/pJ7BAwBpVcfQlgJT02WRivIv8DlCX1cvg6WxaNEXHcdqazuS9fQ7PUoU5CH2UeY3wkqq16wRiWg==",
++      "dependencies": {
++        "async": "~0.9.0",
++        "deep-equal": "~0.2.1",
++        "i": "0.3.x",
++        "mkdirp": "0.x.x",
++        "ncp": "1.0.x",
++        "rimraf": "2.x.x"
++      },
++      "engines": {
++        "node": ">= 0.8.0"
++      }
++    },
++    "node_modules/utile/node_modules/async": {
++      "version": "0.9.2",
++      "resolved": "https://registry.npmjs.org/async/-/async-0.9.2.tgz",
++      "integrity": "sha512-l6ToIJIotphWahxxHyzK9bnLR6kM4jJIIgLShZeqLY7iboHoGkdgFl7W2/Ivi4SkMJYGKqW8vSuk0uKUj6qsSw=="
++    },
++    "node_modules/utile/node_modules/glob": {
++      "version": "7.2.3",
++      "resolved": "https://registry.npmjs.org/glob/-/glob-7.2.3.tgz",
++      "integrity": "sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==",
++      "deprecated": "Glob versions prior to v9 are no longer supported",
++      "dependencies": {
++        "fs.realpath": "^1.0.0",
++        "inflight": "^1.0.4",
++        "inherits": "2",
++        "minimatch": "^3.1.1",
++        "once": "^1.3.0",
++        "path-is-absolute": "^1.0.0"
++      },
++      "engines": {
++        "node": "*"
++      },
++      "funding": {
++        "url": "https://github.com/sponsors/isaacs"
++      }
++    },
++    "node_modules/utile/node_modules/rimraf": {
++      "version": "2.7.1",
++      "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-2.7.1.tgz",
++      "integrity": "sha512-uWjbaKIK3T1OSVptzX7Nl6PvQ3qAGtKEtVRjRuazjfL3Bx5eI409VZSqgND+4UNnmzLVdPj9FqFJNPqBZFve4w==",
++      "deprecated": "Rimraf versions prior to v4 are no longer supported",
++      "dependencies": {
++        "glob": "^7.1.3"
++      },
++      "bin": {
++        "rimraf": "bin.js"
++      }
++    },
+     "node_modules/utils-merge": {
+       "version": "1.0.1",
+       "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.1.tgz",
+diff --git a/package-lock.json b/package-lock.json
+index 5e8c7047..c5833638 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -11,6 +11,7 @@
+         "@expo/vector-icons": "^14.0.2",
+         "@google/genai": "^0.7.0",
+         "@google/generative-ai": "^0.24.0",
++        "@react-native-community/datetimepicker": "^8.3.0",
+         "@react-navigation/bottom-tabs": "^7.2.0",
+         "@react-navigation/native": "^7.0.19",
+         "@react-navigation/stack": "^7.2.3",
+@@ -3583,6 +3584,28 @@
+         "react": "^16.8 || ^17.0 || ^18.0"
+       }
+     },
++    "node_modules/@react-native-community/datetimepicker": {
++      "version": "8.3.0",
++      "resolved": "https://registry.npmjs.org/@react-native-community/datetimepicker/-/datetimepicker-8.3.0.tgz",
++      "integrity": "sha512-K/KgaJbLtjMpx4PaG4efrVIcSe6+DbLufeX1lwPB5YY8i3sq9dOh6WcAcMTLbaRTUpurebQTkl7puHPFm9GalA==",
++      "dependencies": {
++        "invariant": "^2.2.4"
++      },
++      "peerDependencies": {
++        "expo": ">=50.0.0",
++        "react": "*",
++        "react-native": "*",
++        "react-native-windows": "*"
++      },
++      "peerDependenciesMeta": {
++        "expo": {
++          "optional": true
++        },
++        "react-native-windows": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/@react-native/assets-registry": {
+       "version": "0.76.7",
+       "resolved": "https://registry.npmjs.org/@react-native/assets-registry/-/assets-registry-0.76.7.tgz",
+@@ -4857,6 +4880,22 @@
+       "integrity": "sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==",
+       "license": "MIT"
+     },
++    "node_modules/asn1": {
++      "version": "0.1.11",
++      "resolved": "https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz",
++      "integrity": "sha512-Fh9zh3G2mZ8qM/kwsiKwL2U2FmXxVsboP4x1mXjnhKHv3SmzaBZoYvxEQJz/YS2gnCgd8xlAVWcZnQyC9qZBsA==",
++      "engines": {
++        "node": ">=0.4.9"
++      }
++    },
++    "node_modules/assert-plus": {
++      "version": "0.1.5",
++      "resolved": "https://registry.npmjs.org/assert-plus/-/assert-plus-0.1.5.tgz",
++      "integrity": "sha512-brU24g7ryhRwGCI2y+1dGQmQXiZF7TtIj583S96y0jjdajIe6wn8BuXyELYhvD22dtIxDQVFk04YTJwwdwOYJw==",
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
+     "node_modules/ast-types": {
+       "version": "0.15.2",
+       "resolved": "https://registry.npmjs.org/ast-types/-/ast-types-0.15.2.tgz",
+@@ -4869,6 +4908,14 @@
+         "node": ">=4"
+       }
+     },
++    "node_modules/async": {
++      "version": "0.1.22",
++      "resolved": "https://registry.npmjs.org/async/-/async-0.1.22.tgz",
++      "integrity": "sha512-2tEzliJmf5fHNafNwQLJXUasGzQCVctvsNkXmnlELHwypU0p08/rHohYvkqKIjyXpx+0rkrYv6QbhJ+UF4QkBg==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/async-limiter": {
+       "version": "1.0.1",
+       "resolved": "https://registry.npmjs.org/async-limiter/-/async-limiter-1.0.1.tgz",
+@@ -4890,6 +4937,14 @@
+         "node": ">= 4.0.0"
+       }
+     },
++    "node_modules/aws-sign": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/aws-sign/-/aws-sign-0.3.0.tgz",
++      "integrity": "sha512-pEMJAknifcXqXqYVXzGPIu8mJvxtJxIdpVpAs8HNS+paT+9srRUDMQn+3hULS7WbLmttcmvgMvnDcFujqXJyPw==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/babel-core": {
+       "version": "7.0.0-bridge.0",
+       "resolved": "https://registry.npmjs.org/babel-core/-/babel-core-7.0.0-bridge.0.tgz",
+@@ -5171,6 +5226,27 @@
+         "url": "https://github.com/sponsors/sindresorhus"
+       }
+     },
++    "node_modules/bfg": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/bfg/-/bfg-0.3.0.tgz",
++      "integrity": "sha512-ONjB4wuXKTdwEzqf5Xzd0CSkPAJuISB7JQozKG0g61c70YeG05o3mdyAKGlIhcNGHarOPemZCljJxOomTo6pCw==",
++      "dependencies": {
++        "busboy": "~0.2.3",
++        "commander": "~2.1.0",
++        "pkgcloud": "~0.9.4"
++      },
++      "bin": {
++        "bfg": "src/cli.js"
++      }
++    },
++    "node_modules/bfg/node_modules/commander": {
++      "version": "2.1.0",
++      "resolved": "https://registry.npmjs.org/commander/-/commander-2.1.0.tgz",
++      "integrity": "sha512-J2wnb6TKniXNOtoHS8TSrG9IOQluPrsmyAJ8oCUJOBmv+uLBCyPYAZkD2jFvw2DCzIXNnISIM01NIvr35TkBMQ==",
++      "engines": {
++        "node": ">= 0.6.x"
++      }
++    },
+     "node_modules/big-integer": {
+       "version": "1.6.52",
+       "resolved": "https://registry.npmjs.org/big-integer/-/big-integer-1.6.52.tgz",
+@@ -5247,6 +5323,27 @@
+         "node": ">= 0.8"
+       }
+     },
++    "node_modules/boom": {
++      "version": "0.4.2",
++      "resolved": "https://registry.npmjs.org/boom/-/boom-0.4.2.tgz",
++      "integrity": "sha512-OvfN8y1oAxxphzkl2SnCS+ztV/uVKTATtgLjWYg/7KwcNyf3rzpHxNQJZCKtsZd4+MteKczhWbSjtEX4bGgU9g==",
++      "deprecated": "This version has been deprecated in accordance with the hapi support policy (hapi.im/support). Please upgrade to the latest version to get the best features, bug fixes, and security patches. If you are unable to upgrade at this time, paid support is available for older versions (hapi.im/commercial).",
++      "dependencies": {
++        "hoek": "0.9.x"
++      },
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
++    "node_modules/boom/node_modules/hoek": {
++      "version": "0.9.1",
++      "resolved": "https://registry.npmjs.org/hoek/-/hoek-0.9.1.tgz",
++      "integrity": "sha512-ZZ6eGyzGjyMTmpSPYVECXy9uNfqBR7x5CavhUaLOeD6W0vWK1mp/b7O3f86XE0Mtfo9rZ6Bh3fnuw9Xr8MF9zA==",
++      "deprecated": "This version has been deprecated in accordance with the hapi support policy (hapi.im/support). Please upgrade to the latest version to get the best features, bug fixes, and security patches. If you are unable to upgrade at this time, paid support is available for older versions (hapi.im/commercial).",
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/bplist-creator": {
+       "version": "0.0.7",
+       "resolved": "https://registry.npmjs.org/bplist-creator/-/bplist-creator-0.0.7.tgz",
+@@ -5388,6 +5485,18 @@
+       "integrity": "sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==",
+       "license": "MIT"
+     },
++    "node_modules/busboy": {
++      "version": "0.2.14",
++      "resolved": "https://registry.npmjs.org/busboy/-/busboy-0.2.14.tgz",
++      "integrity": "sha512-InWFDomvlkEj+xWLBfU3AvnbVYqeTWmQopiW0tWWEy5yehYm2YkGEc59sUmw/4ty5Zj/b0WHGs1LgecuBSBGrg==",
++      "dependencies": {
++        "dicer": "0.2.5",
++        "readable-stream": "1.1.x"
++      },
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/bytes": {
+       "version": "3.1.2",
+       "resolved": "https://registry.npmjs.org/bytes/-/bytes-3.1.2.tgz",
+@@ -5979,6 +6088,14 @@
+         "node": ">= 0.6"
+       }
+     },
++    "node_modules/cookie-jar": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/cookie-jar/-/cookie-jar-0.3.0.tgz",
++      "integrity": "sha512-dX1400pzPULr+ZovkIsDEqe7XH8xCAYGT5Dege4Eot44Qs2mS2iJmnh45TxTO5MIsCfrV/JGZVloLhm46AHxNw==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/cookie-signature": {
+       "version": "1.0.6",
+       "resolved": "https://registry.npmjs.org/cookie-signature/-/cookie-signature-1.0.6.tgz",
+@@ -5997,6 +6114,11 @@
+         "url": "https://opencollective.com/core-js"
+       }
+     },
++    "node_modules/core-util-is": {
++      "version": "1.0.3",
++      "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.3.tgz",
++      "integrity": "sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ=="
++    },
+     "node_modules/cosmiconfig": {
+       "version": "5.2.1",
+       "resolved": "https://registry.npmjs.org/cosmiconfig/-/cosmiconfig-5.2.1.tgz",
+@@ -6079,6 +6201,18 @@
+         "node": "*"
+       }
+     },
++    "node_modules/cryptiles": {
++      "version": "0.2.2",
++      "resolved": "https://registry.npmjs.org/cryptiles/-/cryptiles-0.2.2.tgz",
++      "integrity": "sha512-gvWSbgqP+569DdslUiCelxIv3IYK5Lgmq1UrRnk+s1WxQOQ16j3GPDcjdtgL5Au65DU/xQi6q3xPtf5Kta+3IQ==",
++      "deprecated": "This version has been deprecated in accordance with the hapi support policy (hapi.im/support). Please upgrade to the latest version to get the best features, bug fixes, and security patches. If you are unable to upgrade at this time, paid support is available for older versions (hapi.im/commercial).",
++      "dependencies": {
++        "boom": "0.4.x"
++      },
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/crypto-random-string": {
+       "version": "2.0.0",
+       "resolved": "https://registry.npmjs.org/crypto-random-string/-/crypto-random-string-2.0.0.tgz",
+@@ -6131,6 +6265,14 @@
+       "devOptional": true,
+       "license": "MIT"
+     },
++    "node_modules/ctype": {
++      "version": "0.5.3",
++      "resolved": "https://registry.npmjs.org/ctype/-/ctype-0.5.3.tgz",
++      "integrity": "sha512-T6CEkoSV4q50zW3TlTHMbzy1E5+zlnNcY+yb7tWVYlTwPhx9LpnfAkd4wecpWknDyptp4k97LUZeInlf6jdzBg==",
++      "engines": {
++        "node": ">= 0.4"
++      }
++    },
+     "node_modules/data-urls": {
+       "version": "3.0.2",
+       "resolved": "https://registry.npmjs.org/data-urls/-/data-urls-3.0.2.tgz",
+@@ -6194,6 +6336,11 @@
+         }
+       }
+     },
++    "node_modules/deep-equal": {
++      "version": "0.2.2",
++      "resolved": "https://registry.npmjs.org/deep-equal/-/deep-equal-0.2.2.tgz",
++      "integrity": "sha512-FXgye2Jr6oEk01S7gmSrHrPEQ1ontR7wwl+nYiZ8h4SXlHVm0DYda74BIPcHz2s2qPz4+375IcAz1vsWLwddgQ=="
++    },
+     "node_modules/deep-extend": {
+       "version": "0.6.0",
+       "resolved": "https://registry.npmjs.org/deep-extend/-/deep-extend-0.6.0.tgz",
+@@ -6318,6 +6465,18 @@
+         "node": ">=8"
+       }
+     },
++    "node_modules/dicer": {
++      "version": "0.2.5",
++      "resolved": "https://registry.npmjs.org/dicer/-/dicer-0.2.5.tgz",
++      "integrity": "sha512-FDvbtnq7dzlPz0wyYlOExifDEZcu8h+rErEXgfxqmLfRfC/kJidEFh4+effJRO3P0xmfqyPbSMG0LveNRfTKVg==",
++      "dependencies": {
++        "readable-stream": "1.1.x",
++        "streamsearch": "0.1.2"
++      },
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/diff-sequences": {
+       "version": "29.6.3",
+       "resolved": "https://registry.npmjs.org/diff-sequences/-/diff-sequences-29.6.3.tgz",
+@@ -6519,6 +6678,14 @@
+         "stackframe": "^1.3.4"
+       }
+     },
++    "node_modules/errs": {
++      "version": "0.2.4",
++      "resolved": "https://registry.npmjs.org/errs/-/errs-0.2.4.tgz",
++      "integrity": "sha512-btTuvM73tHesc12VR/AcJW42s4pUOtXXjufHQIwlv80kvtBFjNBj52fs5+rrU7onVlI1kFoT+b/rBAbEaq+z2Q==",
++      "engines": {
++        "node": ">= 0.4.0"
++      }
++    },
+     "node_modules/es-define-property": {
+       "version": "1.0.1",
+       "resolved": "https://registry.npmjs.org/es-define-property/-/es-define-property-1.0.1.tgz",
+@@ -6711,6 +6878,11 @@
+         "node": ">=6"
+       }
+     },
++    "node_modules/eventemitter2": {
++      "version": "0.4.14",
++      "resolved": "https://registry.npmjs.org/eventemitter2/-/eventemitter2-0.4.14.tgz",
++      "integrity": "sha512-K7J4xq5xAD5jHsGM5ReWXRTFa3JRGofHiMcVgQ8PRwgWxzjHpMWCIzsmyf60+mh8KLsqYPcjUMa0AC4hd6lPyQ=="
++    },
+     "node_modules/eventemitter3": {
+       "version": "5.0.1",
+       "resolved": "https://registry.npmjs.org/eventemitter3/-/eventemitter3-5.0.1.tgz",
+@@ -6947,7 +7119,6 @@
+       "version": "16.0.18",
+       "resolved": "https://registry.npmjs.org/expo-camera/-/expo-camera-16.0.18.tgz",
+       "integrity": "sha512-NP5u2yyc+wZc9GdUXH+jcEytyXZwBnHxItMwXoZQQxi4wgltwvs4XfSWjBtRZe1LngnhpBfPyPJV0aShjWlLDg==",
+-      "license": "MIT",
+       "dependencies": {
+         "invariant": "^2.2.4"
+       },
+@@ -7504,6 +7675,14 @@
+       "integrity": "sha512-e6eB7zN6UBSwGVwrbWVH+gdLnkW9WwHhmq2YDK1Sh30pzx1onRVGBvogTlUeWxwTa+L86NYdo4hFkh7O8ZjSnA==",
+       "license": "MIT"
+     },
++    "node_modules/filed": {
++      "version": "0.0.7",
++      "resolved": "https://registry.npmjs.org/filed/-/filed-0.0.7.tgz",
++      "integrity": "sha512-5ET8UDrcysKn9+v/Fq6pUi31XaHLnI5QiMdfothtGFtR9GUMA5KxNmqrSQEk2TIOe1TJU7tLlJxqUDXCM/ICWQ==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/fill-range": {
+       "version": "7.1.1",
+       "resolved": "https://registry.npmjs.org/fill-range/-/fill-range-7.1.1.tgz",
+@@ -7720,6 +7899,14 @@
+         "url": "https://github.com/sponsors/isaacs"
+       }
+     },
++    "node_modules/forever-agent": {
++      "version": "0.5.2",
++      "resolved": "https://registry.npmjs.org/forever-agent/-/forever-agent-0.5.2.tgz",
++      "integrity": "sha512-PDG5Ef0Dob/JsZUxUltJOhm/Y9mlteAE+46y3M9RBz/Rd3QVENJ75aGRhN56yekTUboaBIkd8KVWX2NjF6+91A==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/form-data": {
+       "version": "3.0.3",
+       "resolved": "https://registry.npmjs.org/form-data/-/form-data-3.0.3.tgz",
+@@ -8185,6 +8372,21 @@
+         "node": ">= 0.4"
+       }
+     },
++    "node_modules/hawk": {
++      "version": "0.13.1",
++      "resolved": "https://registry.npmjs.org/hawk/-/hawk-0.13.1.tgz",
++      "integrity": "sha512-f/1H9bruKJfgLN2KFd+666ILQvJYsJcxaCoIdHaaD2zgl7RUa08/202pGJXhOmQ1kTEdMTSxPnbCsu4l6JARhQ==",
++      "deprecated": "This module moved to @hapi/hawk. Please make sure to switch over as this distribution is no longer supported and may contain bugs and critical security issues.",
++      "dependencies": {
++        "boom": "0.4.x",
++        "cryptiles": "0.2.x",
++        "hoek": "0.8.x",
++        "sntp": "0.2.x"
++      },
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/hermes-estree": {
+       "version": "0.23.1",
+       "resolved": "https://registry.npmjs.org/hermes-estree/-/hermes-estree-0.23.1.tgz",
+@@ -8200,6 +8402,15 @@
+         "hermes-estree": "0.23.1"
+       }
+     },
++    "node_modules/hoek": {
++      "version": "0.8.5",
++      "resolved": "https://registry.npmjs.org/hoek/-/hoek-0.8.5.tgz",
++      "integrity": "sha512-NoKdeYUBOlQ7j9dgvT9BEX90rE6HtDkaMFwR6hfOj26LA2Mwyg5026jOpNBhmNrWIGdPnbBK3sQJI3POwh8wqg==",
++      "deprecated": "This version has been deprecated in accordance with the hapi support policy (hapi.im/support). Please upgrade to the latest version to get the best features, bug fixes, and security patches. If you are unable to upgrade at this time, paid support is available for older versions (hapi.im/commercial).",
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/hoist-non-react-statics": {
+       "version": "3.3.2",
+       "resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
+@@ -8293,6 +8504,19 @@
+         "node": ">= 6"
+       }
+     },
++    "node_modules/http-signature": {
++      "version": "0.10.1",
++      "resolved": "https://registry.npmjs.org/http-signature/-/http-signature-0.10.1.tgz",
++      "integrity": "sha512-coK8uR5rq2IMj+Hen+sKPA5ldgbCc1/spPdKCL1Fw6h+D0s/2LzMcRK0Cqufs1h0ryx/niwBHGFu8HC3hwU+lA==",
++      "dependencies": {
++        "asn1": "0.1.11",
++        "assert-plus": "^0.1.5",
++        "ctype": "0.5.3"
++      },
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
+     "node_modules/https-proxy-agent": {
+       "version": "5.0.1",
+       "resolved": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-5.0.1.tgz",
+@@ -8322,6 +8546,14 @@
+       "integrity": "sha512-WDC/ui2VVRrz3jOVi+XtjqkDjiVjTtFaAGiW37k6b+ohyQ5wYDOGkvCZa8+H0nx3gyvv0+BST9xuOgIyGQ00gw==",
+       "license": "BSD-3-Clause"
+     },
++    "node_modules/i": {
++      "version": "0.3.7",
++      "resolved": "https://registry.npmjs.org/i/-/i-0.3.7.tgz",
++      "integrity": "sha512-FYz4wlXgkQwIPqhzC5TdNMLSE5+GS1IIDJZY/1ZiEPCT2S3COUVZeT5OW4BmW4r5LHLQuOosSwsvnroG9GR59Q==",
++      "engines": {
++        "node": ">=0.4"
++      }
++    },
+     "node_modules/iconv-lite": {
+       "version": "0.6.3",
+       "resolved": "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz",
+@@ -8494,6 +8726,11 @@
+         "loose-envify": "^1.0.0"
+       }
+     },
++    "node_modules/ip": {
++      "version": "0.0.5",
++      "resolved": "https://registry.npmjs.org/ip/-/ip-0.0.5.tgz",
++      "integrity": "sha512-v0CtD+JtdBqc2ola3KMeZ1ohE20QJQOGg50lpmg73nqe/8Ocx6RQ8A0SrEsNmCoXvSldMPrWgCvfUqJJIRr79Q=="
++    },
+     "node_modules/ip-regex": {
+       "version": "2.1.0",
+       "resolved": "https://registry.npmjs.org/ip-regex/-/ip-regex-2.1.0.tgz",
+@@ -8670,6 +8907,11 @@
+         "node": ">=8"
+       }
+     },
++    "node_modules/isarray": {
++      "version": "0.0.1",
++      "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz",
++      "integrity": "sha512-D2S+3GLxWH+uhrNEcoh/fnmYeP8E8/zHl644d/jdA0g2uyXvy3sb0qxotE+ne0LtccHknQzWwZEzhak7oJ0COQ=="
++    },
+     "node_modules/isexe": {
+       "version": "2.0.0",
+       "resolved": "https://registry.npmjs.org/isexe/-/isexe-2.0.0.tgz",
+@@ -9923,6 +10165,11 @@
+       "integrity": "sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==",
+       "license": "MIT"
+     },
++    "node_modules/json-stringify-safe": {
++      "version": "4.0.0",
++      "resolved": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-4.0.0.tgz",
++      "integrity": "sha512-qzEpz1SDUb9xvA+LDOkNgjekdV7tuC7zDQf14sqMBtujh8kVbQhF11VWm4DeR99yFNjVSjTTfKa40c9ZQOtwXA=="
++    },
+     "node_modules/json5": {
+       "version": "2.2.3",
+       "resolved": "https://registry.npmjs.org/json5/-/json5-2.2.3.tgz",
+@@ -11168,6 +11415,14 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/ncp": {
++      "version": "1.0.1",
++      "resolved": "https://registry.npmjs.org/ncp/-/ncp-1.0.1.tgz",
++      "integrity": "sha512-akBX7I5X9KQDDWmYYgQlLbVbjkveTje2mioZjhLLrVt09akSZcoqXWE5LEn1E2fu8T7th1PZYGfewQsTkTLTmQ==",
++      "bin": {
++        "ncp": "bin/ncp"
++      }
++    },
+     "node_modules/negotiator": {
+       "version": "0.6.3",
+       "resolved": "https://registry.npmjs.org/negotiator/-/negotiator-0.6.3.tgz",
+@@ -11270,6 +11525,15 @@
+       "integrity": "sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==",
+       "license": "MIT"
+     },
++    "node_modules/node-uuid": {
++      "version": "1.4.8",
++      "resolved": "https://registry.npmjs.org/node-uuid/-/node-uuid-1.4.8.tgz",
++      "integrity": "sha512-TkCET/3rr9mUuRp+CpO7qfgT++aAxfDRaalQhwPFzI9BY/2rCDn6OfpZOVggi1AXfTPpfkTrg5f5WQx5G1uLxA==",
++      "deprecated": "Use uuid module instead",
++      "bin": {
++        "uuid": "bin/uuid"
++      }
++    },
+     "node_modules/normalize-path": {
+       "version": "3.0.0",
+       "resolved": "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz",
+@@ -11340,6 +11604,14 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/oauth-sign": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/oauth-sign/-/oauth-sign-0.3.0.tgz",
++      "integrity": "sha512-Tr31Sh5FnK9YKm7xTUPyDMsNOvMqkVDND0zvK/Wgj7/H9q8mpye0qG2nVzrnsvLhcsX5DtqXD0la0ks6rkPCGQ==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/ob1": {
+       "version": "0.81.4",
+       "resolved": "https://registry.npmjs.org/ob1/-/ob1-0.81.4.tgz",
+@@ -11854,6 +12126,62 @@
+         "node": ">=8"
+       }
+     },
++    "node_modules/pkgcloud": {
++      "version": "0.9.6",
++      "resolved": "https://registry.npmjs.org/pkgcloud/-/pkgcloud-0.9.6.tgz",
++      "integrity": "sha512-L/yFApX/oJLLwQYm2PEceWZhyQa9N3Pgk16BlwXaU2SjOtxcEEpyWKtslhzkyvc+2wWg6MJkhsRGyYI0Nsf15w==",
++      "dependencies": {
++        "async": "0.1.x",
++        "errs": "0.2.x",
++        "eventemitter2": "0.4.x",
++        "filed": "0.0.7",
++        "ip": "0.0.x",
++        "mime": "1.2.x",
++        "pkginfo": "0.2.x",
++        "qs": "0.6.x",
++        "request": "2.22.x",
++        "through": "~2.3",
++        "underscore": "1.4.x",
++        "url-join": "0.0.x",
++        "utile": "0.x.x",
++        "xml2js": "0.1.x"
++      },
++      "engines": {
++        "node": "0.8.x || 0.10.x"
++      }
++    },
++    "node_modules/pkgcloud/node_modules/mime": {
++      "version": "1.2.11",
++      "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz",
++      "integrity": "sha512-Ysa2F/nqTNGHhhm9MV8ure4+Hc+Y8AWiqUdHxsO7xu8zc92ND9f3kpALHjaP026Ft17UfxrMt95c50PLUeynBw=="
++    },
++    "node_modules/pkgcloud/node_modules/qs": {
++      "version": "0.6.6",
++      "resolved": "https://registry.npmjs.org/qs/-/qs-0.6.6.tgz",
++      "integrity": "sha512-kN+yNdAf29Jgp+AYHUmC7X4QdJPR8czuMWLNLc0aRxkQ7tB3vJQEONKKT9ou/rW7EbqVec11srC9q9BiVbcnHA==",
++      "engines": {
++        "node": "*"
++      }
++    },
++    "node_modules/pkgcloud/node_modules/xml2js": {
++      "version": "0.1.14",
++      "resolved": "https://registry.npmjs.org/xml2js/-/xml2js-0.1.14.tgz",
++      "integrity": "sha512-pbdws4PPPNc1HPluSUKamY4GWMk592K7qwcj6BExbVOhhubub8+pMda/ql68b6L3luZs/OGjGSB5goV7SnmgnA==",
++      "dependencies": {
++        "sax": ">=0.1.1"
++      },
++      "engines": {
++        "node": "*"
++      }
++    },
++    "node_modules/pkginfo": {
++      "version": "0.2.3",
++      "resolved": "https://registry.npmjs.org/pkginfo/-/pkginfo-0.2.3.tgz",
++      "integrity": "sha512-7W7wTrE/NsY8xv/DTGjwNIyNah81EQH0MWcTzrHL6pOpMocOGZc0Mbdz9aXxSrp+U0mSmkU8jrNCDCfUs3sOBg==",
++      "engines": {
++        "node": ">= 0.4.0"
++      }
++    },
+     "node_modules/plist": {
+       "version": "3.1.0",
+       "resolved": "https://registry.npmjs.org/plist/-/plist-3.1.0.tgz",
+@@ -12656,6 +12984,17 @@
+         "react": "^18.3.1"
+       }
+     },
++    "node_modules/readable-stream": {
++      "version": "1.1.14",
++      "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.1.14.tgz",
++      "integrity": "sha512-+MeVjFf4L44XUkhM1eYbD8fyEsxcV81pqMSR5gblfcLCHfZvbrqy4/qYHE+/R5HoBUT11WV5O08Cr1n3YXkWVQ==",
++      "dependencies": {
++        "core-util-is": "~1.0.0",
++        "inherits": "~2.0.1",
++        "isarray": "0.0.1",
++        "string_decoder": "~0.10.x"
++      }
++    },
+     "node_modules/readline": {
+       "version": "1.3.0",
+       "resolved": "https://registry.npmjs.org/readline/-/readline-1.3.0.tgz",
+@@ -12763,6 +13102,79 @@
+       "integrity": "sha512-o4S4Qh6L2jpnCy83ysZDau+VORNvnFw07CKSAymkd6ICNVEPisMyzlc00KlvvicsxKck94SEwhDnMNdICzO+tA==",
+       "license": "MIT"
+     },
++    "node_modules/request": {
++      "version": "2.22.0",
++      "resolved": "https://registry.npmjs.org/request/-/request-2.22.0.tgz",
++      "integrity": "sha512-s05oCBjWuzNi/UbZtvwOnSJ85/lHUdYPriJyFUwdxHKr8VcZHB0wx0eTX8y5hCH3p7OTDi9iQUqMFyDkW6K7EQ==",
++      "deprecated": "request has been deprecated, see https://github.com/request/request/issues/3142",
++      "engines": [
++        "node >= 0.8.0"
++      ],
++      "dependencies": {
++        "aws-sign": "~0.3.0",
++        "cookie-jar": "~0.3.0",
++        "forever-agent": "~0.5.0",
++        "form-data": "0.0.8",
++        "hawk": "~0.13.0",
++        "http-signature": "~0.10.0",
++        "json-stringify-safe": "~4.0.0",
++        "mime": "~1.2.9",
++        "node-uuid": "~1.4.0",
++        "oauth-sign": "~0.3.0",
++        "qs": "~0.6.0",
++        "tunnel-agent": "~0.3.0"
++      }
++    },
++    "node_modules/request/node_modules/async": {
++      "version": "0.2.10",
++      "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz",
++      "integrity": "sha512-eAkdoKxU6/LkKDBzLpT+t6Ff5EtfSF4wx1WfJiPEEV7WNLnDaRXk0oVysiEPm262roaachGexwUv94WhSgN5TQ=="
++    },
++    "node_modules/request/node_modules/combined-stream": {
++      "version": "0.0.7",
++      "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-0.0.7.tgz",
++      "integrity": "sha512-qfexlmLp9MyrkajQVyjEDb0Vj+KhRgR/rxLiVhaihlT+ZkX0lReqtH6Ack40CvMDERR4b5eFp3CreskpBs1Pig==",
++      "dependencies": {
++        "delayed-stream": "0.0.5"
++      },
++      "engines": {
++        "node": ">= 0.8"
++      }
++    },
++    "node_modules/request/node_modules/delayed-stream": {
++      "version": "0.0.5",
++      "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz",
++      "integrity": "sha512-v+7uBd1pqe5YtgPacIIbZ8HuHeLFVNe4mUEyFDXL6KiqzEykjbw+5mXZXpGFgNVasdL4jWKgaKIXrEHiynN1LA==",
++      "engines": {
++        "node": ">=0.4.0"
++      }
++    },
++    "node_modules/request/node_modules/form-data": {
++      "version": "0.0.8",
++      "resolved": "https://registry.npmjs.org/form-data/-/form-data-0.0.8.tgz",
++      "integrity": "sha512-yzpBIhe8Ll+dYTXjd+4ORxbQktke+abD0dJjedvqsVVayMkb+PgLGatJNLwo95Va75l3YDZ01SrouzyW9bC2Fg==",
++      "dependencies": {
++        "async": "~0.2.7",
++        "combined-stream": "~0.0.4",
++        "mime": "~1.2.2"
++      },
++      "engines": {
++        "node": ">= 0.6"
++      }
++    },
++    "node_modules/request/node_modules/mime": {
++      "version": "1.2.11",
++      "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz",
++      "integrity": "sha512-Ysa2F/nqTNGHhhm9MV8ure4+Hc+Y8AWiqUdHxsO7xu8zc92ND9f3kpALHjaP026Ft17UfxrMt95c50PLUeynBw=="
++    },
++    "node_modules/request/node_modules/qs": {
++      "version": "0.6.6",
++      "resolved": "https://registry.npmjs.org/qs/-/qs-0.6.6.tgz",
++      "integrity": "sha512-kN+yNdAf29Jgp+AYHUmC7X4QdJPR8czuMWLNLc0aRxkQ7tB3vJQEONKKT9ou/rW7EbqVec11srC9q9BiVbcnHA==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/require-directory": {
+       "version": "2.1.1",
+       "resolved": "https://registry.npmjs.org/require-directory/-/require-directory-2.1.1.tgz",
+@@ -13462,6 +13874,27 @@
+         "node": ">=8.0.0"
+       }
+     },
++    "node_modules/sntp": {
++      "version": "0.2.4",
++      "resolved": "https://registry.npmjs.org/sntp/-/sntp-0.2.4.tgz",
++      "integrity": "sha512-bDLrKa/ywz65gCl+LmOiIhteP1bhEsAAzhfMedPoiHP3dyYnAevlaJshdqb9Yu0sRifyP/fRqSt8t+5qGIWlGQ==",
++      "deprecated": "This module moved to @hapi/sntp. Please make sure to switch over as this distribution is no longer supported and may contain bugs and critical security issues.",
++      "dependencies": {
++        "hoek": "0.9.x"
++      },
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
++    "node_modules/sntp/node_modules/hoek": {
++      "version": "0.9.1",
++      "resolved": "https://registry.npmjs.org/hoek/-/hoek-0.9.1.tgz",
++      "integrity": "sha512-ZZ6eGyzGjyMTmpSPYVECXy9uNfqBR7x5CavhUaLOeD6W0vWK1mp/b7O3f86XE0Mtfo9rZ6Bh3fnuw9Xr8MF9zA==",
++      "deprecated": "This version has been deprecated in accordance with the hapi support policy (hapi.im/support). Please upgrade to the latest version to get the best features, bug fixes, and security patches. If you are unable to upgrade at this time, paid support is available for older versions (hapi.im/commercial).",
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/source-map": {
+       "version": "0.6.1",
+       "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz",
+@@ -13638,6 +14071,14 @@
+         "node": ">= 0.10.0"
+       }
+     },
++    "node_modules/streamsearch": {
++      "version": "0.1.2",
++      "resolved": "https://registry.npmjs.org/streamsearch/-/streamsearch-0.1.2.tgz",
++      "integrity": "sha512-jos8u++JKm0ARcSUTAZXOVC0mSox7Bhn6sBgty73P1f3JGf7yG2clTbBNHUdde/kdvP2FESam+vM6l8jBrNxHA==",
++      "engines": {
++        "node": ">=0.8.0"
++      }
++    },
+     "node_modules/strict-uri-encode": {
+       "version": "2.0.0",
+       "resolved": "https://registry.npmjs.org/strict-uri-encode/-/strict-uri-encode-2.0.0.tgz",
+@@ -13647,6 +14088,11 @@
+         "node": ">=4"
+       }
+     },
++    "node_modules/string_decoder": {
++      "version": "0.10.31",
++      "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz",
++      "integrity": "sha512-ev2QzSzWPYmy9GuqfIVildA4OdcGLeFZQrq5ys6RtiuF+RQQiZWr8TZNyAcuVXyQRYfEO+MsoB/1BuQVhOJuoQ=="
++    },
+     "node_modules/string-length": {
+       "version": "4.0.2",
+       "resolved": "https://registry.npmjs.org/string-length/-/string-length-4.0.2.tgz",
+@@ -14343,6 +14789,14 @@
+       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",
+       "license": "0BSD"
+     },
++    "node_modules/tunnel-agent": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.3.0.tgz",
++      "integrity": "sha512-jlGqHGoKzyyjhwv/c9omAgohntThMcGtw8RV/RDLlkbbc08kni/akVxO62N8HaXMVbVsK1NCnpSK3N2xCt22ww==",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/type-detect": {
+       "version": "4.0.8",
+       "resolved": "https://registry.npmjs.org/type-detect/-/type-detect-4.0.8.tgz",
+@@ -14416,6 +14870,11 @@
+         "node": "*"
+       }
+     },
++    "node_modules/underscore": {
++      "version": "1.4.4",
++      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.4.4.tgz",
++      "integrity": "sha512-ZqGrAgaqqZM7LGRzNjLnw5elevWb5M8LEoDMadxIW3OWbcv72wMMgKdwOKpd5Fqxe8choLD8HN3iSj3TUh/giQ=="
++    },
+     "node_modules/undici": {
+       "version": "6.21.2",
+       "resolved": "https://registry.npmjs.org/undici/-/undici-6.21.2.tgz",
+@@ -14555,6 +15014,11 @@
+         "browserslist": ">= 4.21.0"
+       }
+     },
++    "node_modules/url-join": {
++      "version": "0.0.1",
++      "resolved": "https://registry.npmjs.org/url-join/-/url-join-0.0.1.tgz",
++      "integrity": "sha512-H6dnQ/yPAAVzMQRvEvyz01hhfQL5qRWSEt7BX8t9DqnPw9BjMb64fjIRq76Uvf1hkHp+mTZvEVJ5guXOT0Xqaw=="
++    },
+     "node_modules/url-parse": {
+       "version": "1.5.10",
+       "resolved": "https://registry.npmjs.org/url-parse/-/url-parse-1.5.10.tgz",
+@@ -14584,6 +15048,59 @@
+         "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+       }
+     },
++    "node_modules/utile": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/utile/-/utile-0.3.0.tgz",
++      "integrity": "sha512-KaciY16ate/pJ7BAwBpVcfQlgJT02WRivIv8DlCX1cvg6WxaNEXHcdqazuS9fQ7PUoU5CH2UeY3wkqq16wRiWg==",
++      "dependencies": {
++        "async": "~0.9.0",
++        "deep-equal": "~0.2.1",
++        "i": "0.3.x",
++        "mkdirp": "0.x.x",
++        "ncp": "1.0.x",
++        "rimraf": "2.x.x"
++      },
++      "engines": {
++        "node": ">= 0.8.0"
++      }
++    },
++    "node_modules/utile/node_modules/async": {
++      "version": "0.9.2",
++      "resolved": "https://registry.npmjs.org/async/-/async-0.9.2.tgz",
++      "integrity": "sha512-l6ToIJIotphWahxxHyzK9bnLR6kM4jJIIgLShZeqLY7iboHoGkdgFl7W2/Ivi4SkMJYGKqW8vSuk0uKUj6qsSw=="
++    },
++    "node_modules/utile/node_modules/glob": {
++      "version": "7.2.3",
++      "resolved": "https://registry.npmjs.org/glob/-/glob-7.2.3.tgz",
++      "integrity": "sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==",
++      "deprecated": "Glob versions prior to v9 are no longer supported",
++      "dependencies": {
++        "fs.realpath": "^1.0.0",
++        "inflight": "^1.0.4",
++        "inherits": "2",
++        "minimatch": "^3.1.1",
++        "once": "^1.3.0",
++        "path-is-absolute": "^1.0.0"
++      },
++      "engines": {
++        "node": "*"
++      },
++      "funding": {
++        "url": "https://github.com/sponsors/isaacs"
++      }
++    },
++    "node_modules/utile/node_modules/rimraf": {
++      "version": "2.7.1",
++      "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-2.7.1.tgz",
++      "integrity": "sha512-uWjbaKIK3T1OSVptzX7Nl6PvQ3qAGtKEtVRjRuazjfL3Bx5eI409VZSqgND+4UNnmzLVdPj9FqFJNPqBZFve4w==",
++      "deprecated": "Rimraf versions prior to v4 are no longer supported",
++      "dependencies": {
++        "glob": "^7.1.3"
++      },
++      "bin": {
++        "rimraf": "bin.js"
++      }
++    },
+     "node_modules/utils-merge": {
+       "version": "1.0.1",
+       "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.1.tgz",
+diff --git a/package.json b/package.json
+index 106db67e..5ff2ddd5 100644
+--- a/package.json
++++ b/package.json
+@@ -18,6 +18,7 @@
+     "@expo/vector-icons": "^14.0.2",
+     "@google/genai": "^0.7.0",
+     "@google/generative-ai": "^0.24.0",
++    "@react-native-community/datetimepicker": "^8.3.0",
+     "@react-navigation/bottom-tabs": "^7.2.0",
+ 
+     "@react-navigation/native": "^7.0.19",
+diff --git a/proxy-server/.env b/proxy-server/.env
+deleted file mode 100644
+index 9468afa3..00000000
+--- a/proxy-server/.env
++++ /dev/null
+@@ -1 +0,0 @@
+-GEMINI_API_KEY=AIzaSyDbOpsAHm3VfEKbw7y46EaQEowi9irNBGw
+\ No newline at end of file
+diff --git a/proxy-server/.env.template b/proxy-server/.env.template
+new file mode 100644
+index 00000000..ea1108aa
+--- /dev/null
++++ b/proxy-server/.env.template
+@@ -0,0 +1,2 @@
++# Gemini API configuration
++GEMINI_API_KEY=YOUR_API_KEY_HERE 
+\ No newline at end of file
