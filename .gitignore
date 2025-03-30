@@ -49,3 +49,5 @@ android/
 .env
 
 ./proxy-server/.env
+
+.expo/types/router.d.ts
