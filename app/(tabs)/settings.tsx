@@ -35,7 +35,11 @@ export default function SettingsScreen() {
             <Text style={styles.sectionTitle}>Account</Text>
           </View>
           
-          <Pressable style={styles.settingItem}>
+          <Pressable 
+            style={({ hovered }) => [
+              styles.settingItem,
+              hovered && styles.pressableActive
+            ]}>
             <View style={styles.settingLeft}>
               <View style={styles.iconContainer}>
                 <Ionicons name="person" size={20} color={primaryBlue} />
@@ -45,7 +49,11 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
           </Pressable>
           
-          <Pressable style={styles.settingItem}>
+          <Pressable 
+            style={({ hovered }) => [
+              styles.settingItem,
+              hovered && styles.pressableActive
+            ]}>
             <View style={styles.settingLeft}>
               <View style={styles.iconContainer}>
                 <Ionicons name="medical" size={20} color={primaryBlue} />
@@ -139,7 +147,11 @@ export default function SettingsScreen() {
             <Text style={styles.sectionTitle}>Support</Text>
           </View>
           
-          <Pressable style={styles.settingItem}>
+          <Pressable 
+            style={({ hovered }) => [
+              styles.settingItem,
+              hovered && styles.pressableActive
+            ]}>
             <View style={styles.settingLeft}>
               <LinearGradient
                 colors={[primaryTeal, primaryBlue] as const}
@@ -154,7 +166,11 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
           </Pressable>
           
-          <Pressable style={styles.settingItem}>
+          <Pressable 
+            style={({ hovered }) => [
+              styles.settingItem,
+              hovered && styles.pressableActive
+            ]}>
             <View style={styles.settingLeft}>
               <LinearGradient
                 colors={[primaryBlue, primaryTeal] as const}
@@ -169,7 +185,12 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
           </Pressable>
           
-          <Pressable style={[styles.settingItem, styles.logoutItem]}>
+          <Pressable 
+            style={({ hovered }) => [
+              styles.settingItem, 
+              styles.logoutItem,
+              hovered && styles.pressableActive
+            ]}>
             <Text style={styles.logoutText}>Log Out</Text>
           </Pressable>
         </View>
@@ -188,6 +209,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     paddingHorizontal: 20,
     alignItems: 'center',
+  },
+  pressableActive: {
+    backgroundColor: 'gray',
   },
   title: {
     color: white,
