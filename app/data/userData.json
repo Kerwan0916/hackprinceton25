@@ -2,7 +2,7 @@
   "medications": [
     {
       "id": "1",
-      "name": "Lisinopril",
+      "name": "Ibuprofen",
       "dosage": "10mg",
       "schedule": "Take once daily in the morning",
       "checked": true,
@@ -13,7 +13,7 @@
     },
     {
       "id": "2",
-      "name": "Metformin",
+      "name": "Oxycodone",
       "dosage": "500mg",
       "schedule": "Take twice daily with meals",
       "checked": true,
