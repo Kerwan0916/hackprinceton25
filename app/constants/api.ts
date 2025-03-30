@@ -1,1 +1,1 @@
-export const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY || ''; 
+export const GOOGLE_API_KEY = "AIzaSyDbOpsAHm3VfEKbw7y46EaQEowi9irNBGw"; 
