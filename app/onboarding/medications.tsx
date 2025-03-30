@@ -125,7 +125,7 @@ export default function MedicationsScreen() {
           </View>
 
           <Pressable
-            onPress={() => router.push('/onboarding/reminders' as any)}
+            onPress={() => router.push('/(tabs)' as any)}
           >
             <LinearGradient
               colors={[primaryBlue, primaryTeal] as const}
