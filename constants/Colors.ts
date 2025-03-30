@@ -4,7 +4,7 @@
  */
 
 /**
- * Color scheme for CareBlue
+ * Color scheme for Syndra
  * Primary colors and derived colors for consistent styling
  */
 

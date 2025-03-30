@@ -35,7 +35,7 @@ export default function HealthInfoScreen() {
           end={{ x: 1, y: 0 }}
           style={styles.header}
         >
-          <Text style={styles.title}>Welcome to CareBlue</Text>
+          <Text style={styles.title}>Welcome to Syndra</Text>
         </LinearGradient>
 
         <View style={styles.card}>
