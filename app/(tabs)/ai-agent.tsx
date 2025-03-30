@@ -6,6 +6,7 @@ import * as Speech from 'expo-speech';
 import { GoogleGenAI } from "@google/genai";
 import { GOOGLE_API_KEY } from '@/constants/api';
 import { Message } from '@/interface/message';
+import { SNAP_PROMPT } from '@/constants/snap-prompt';
 
 export default function AIAgentScreen() {
   const [messages, setMessages] = useState<Message[]>([
@@ -76,9 +77,7 @@ export default function AIAgentScreen() {
 
         const result = await ai.models.generateContent({
           model: "gemini-2.5-pro-exp-03-25",
-          config: {
-            systemInstruction: "You are a health assistant. You are responsible for helping the user with their health questions and concerns. You are also responsible for transcribing the user's audio message and responding to it.",
-          },
+          config: { systemInstruction: SNAP_PROMPT },
           contents: contents,
         });
         
