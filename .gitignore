@@ -52,6 +52,11 @@ android/
 =======
 *.env*
 
+<<<<<<< HEAD
 >>>>>>> b45f3c4a (update gitignore)
+=======
+../.env
+
+>>>>>>> 9b3c3826 (update gitignore)
 
 >>>>>>> 3c860121 (update gitignore)
