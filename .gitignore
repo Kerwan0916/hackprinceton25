@@ -47,3 +47,5 @@ constants/api.ts
 android/
 
 .env
+
+.expo/types/router.d.ts
