@@ -11,7 +11,7 @@ export default function SettingsScreen() {
   const [locationEnabled, setLocationEnabled] = React.useState(true);
   const colorScheme = useColorScheme() || 'light';
   const theme = Colors[colorScheme];
-  
+
   return (
     <View style={styles.container}>
       <LinearGradient
