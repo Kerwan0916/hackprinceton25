@@ -5,14 +5,13 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { LinearGradient } from 'expo-linear-gradient';
-import userData from '../data/userData.json';
 
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { Colors, primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { router } from 'expo-router';
 export default function HomeScreen() {
-  const userName = userData.name; // Get name from userData.json
+  const userName = "Name"; // This would come from user profile in a real app
   const colorScheme = useColorScheme() || 'light';
   const theme = Colors[colorScheme];
   
