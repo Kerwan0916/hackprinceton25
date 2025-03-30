@@ -6,6 +6,7 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import { Buffer } from 'buffer';
+import userData from '../data/userData.json';
 
 // Access your API key (see "Set up your API key" below)
 const API_KEY = Constants.expoConfig?.extra?.apiKey;
@@ -49,9 +50,9 @@ const safetySettings = [
   },
 ];
 
-// Define patient information variables that can be updated later
-let patientName: string | null = null; // This will be set when patient information is available 
-let patientMedicalHistory: string | null = null; // This will be set when medical history is available
+// Define patient information variables from userData.json
+let patientName: string = userData.name; 
+let patientMedicalHistory: string = userData.medicalHistory; 
 
 // System instruction to guide the AI
 const systemInstruction = `You are an AI healthcare assistant designed to help patients check in when they feel they might be experiencing symptoms.

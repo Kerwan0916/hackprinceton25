@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, ScrollView } from 'react-native';
 import OnboardingCard from '../../components/onboarding/OnboardingCard';
-import { AccountIcon, HealthInfoIcon, MedicationsIcon, RemindersIcon } from '../../components/onboarding/OnboardingIcons';
+import { AccountIcon, HealthInfoIcon, MedicationsIcon } from '../../components/onboarding/OnboardingIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { primaryBlue, primaryTeal, darkBlue, lightBlue, offWhite } from '@/constants/Colors';
 
@@ -70,13 +70,6 @@ export default function OnboardingScreen() {
             title="Add Your Medications" 
             description="Include your dosages and schedule" 
             icon={<MedicationsIcon />}
-            nextScreen="/onboarding/reminders"
-          />
-          
-          <OnboardingCard 
-            title="Set Reminder Preferences" 
-            description="Choose when to receive reminders" 
-            icon={<RemindersIcon />}
             nextScreen="/(tabs)"
             isLastCard={true}
           />

@@ -1,21 +1,18 @@
 import { Image, StyleSheet, Platform, View, ScrollView, Pressable, Text } from 'react-native';
-// import { useNavigation } from '@react-navigation/native';
-import { useState } from 'react';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { LinearGradient } from 'expo-linear-gradient';
+import userData from '../data/userData.json';
 
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { Colors, primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-
-import { Redirect, router } from 'expo-router';
-
+import { router } from 'expo-router';
 export default function HomeScreen() {
-  const userName = "Name"; // This would come from user profile in a real app
+  const userName = userData.name; // Get name from userData.json
   const colorScheme = useColorScheme() || 'light';
   const theme = Colors[colorScheme];
   
@@ -37,25 +34,35 @@ export default function HomeScreen() {
       </LinearGradient>
       
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
-        <LinearGradient
-          colors={[lightBlue, lightBlue] as const}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={styles.gradientCard}>
-          <Pressable style={styles.pressableCard}>
-            <LinearGradient
-              colors={[primaryTeal, primaryBlue] as const}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.iconContainer}
-            >
-              <Ionicons name="checkmark" size={24} color="white" />
-            </LinearGradient>
-            <Text style={styles.cardTitle}>Daily Check-in</Text>
-          </Pressable>
-        </LinearGradient>
+        <Pressable style={styles.card}>
+          <LinearGradient
+            colors={[primaryTeal, primaryBlue] as const}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.iconContainer}
+          >
+            <Ionicons name="checkmark" size={24} color="white" />
+          </LinearGradient>
+          <Text style={styles.cardTitle}>Daily Check-in</Text>
+        </Pressable>
+        
+        <Pressable style={styles.card} onPress={() => router.push('/schedule' as any)}>
+          <LinearGradient
+            colors={[primaryBlue, primaryTeal] as const}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.iconContainer}
+          >
+            <FontAwesome5 name="prescription-bottle-alt" size={24} color="white" />
+          </LinearGradient>
+          <View style={styles.medicationContent}>
+            <Text style={styles.cardTitle}>Medications & Schedule</Text>
+            <Text style={styles.reminderText}>Next reminder at 2:00 PM</Text>
+          </View>
+        </Pressable>
         
         <LinearGradient
+
           colors={[lightBlue, lightBlue] as const}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
@@ -79,6 +86,7 @@ export default function HomeScreen() {
 
         <LinearGradient
           colors={[lightBlue, lightBlue] as const}
+
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={styles.gradientCard}
@@ -114,6 +122,8 @@ export default function HomeScreen() {
             <Text style={styles.cardTitle}>Ask a Question</Text>
           </Pressable>
         </LinearGradient>
+        
+        
       </ScrollView>
     </View>
   );

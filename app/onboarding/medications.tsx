@@ -1,52 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
-import MedicationItem from '../../components/onboarding/MedicationItem';
+import MedicationItem from '@/components/onboarding/MedicationItem';
 import { LinearGradient } from 'expo-linear-gradient';
-import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
-
-// Mock data - this would come from the medical provider in a real app
-const mockMedications = [
-  {
-    id: '1',
-    name: 'Lisinopril',
-    dosage: '10mg',
-    schedule: 'Take once daily in the morning',
-  },
-  {
-    id: '2',
-    name: 'Metformin',
-    dosage: '500mg',
-    schedule: 'Take twice daily with meals',
-  },
-  {
-    id: '3',
-    name: 'Atorvastatin',
-    dosage: '20mg',
-    schedule: 'Take once daily at bedtime',
-  },
-  {
-    id: '4',
-    name: 'Levothyroxine',
-    dosage: '50mcg',
-    schedule: 'Take once daily on an empty stomach',
-  },
-];
-
-const mockAllergies = [
-  { id: '1', name: 'Penicillin' },
-  { id: '2', name: 'Sulfa Drugs' },
-  { id: '3', name: 'Aspirin' },
-];
+import { primaryBlue, primaryTeal, white } from '@/constants/Colors';
+import userData from '../data/userData.json';
+import { styles } from './medications.styles';
 
 export default function MedicationsScreen() {
   const [medications, setMedications] = useState(
-    mockMedications.map(med => ({ ...med, checked: true }))
+    userData.medications.map(med => ({ ...med }))
   );
   
   const [allergies, setAllergies] = useState(
-    mockAllergies.map(allergy => ({ ...allergy, checked: true }))
+    userData.allergies.map(allergy => ({ ...allergy }))
   );
 
   const toggleMedication = (id: string) => {
@@ -157,7 +125,7 @@ export default function MedicationsScreen() {
           </View>
 
           <Pressable
-            onPress={() => router.push('/onboarding/reminders' as any)}
+            onPress={() => router.push('/(tabs)' as any)}
           >
             <LinearGradient
               colors={[primaryBlue, primaryTeal] as const}
@@ -172,117 +140,4 @@ export default function MedicationsScreen() {
       </ScrollView>
     </LinearGradient>
   );
-}
-
-const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  container: {
-    flexGrow: 1,
-    padding: 20,
-    paddingBottom: 40,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderRadius: 15,
-    padding: 15,
-  },
-  backButton: {
-    padding: 8,
-  },
-  titleContainer: {
-    flex: 1,
-    alignItems: 'center',
-    marginRight: 40,
-  },
-  stepText: {
-    fontSize: 14,
-    color: white,
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: white,
-    textAlign: 'center',
-  },
-  card: {
-    backgroundColor: white,
-    borderRadius: 20,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: lightBlue,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  iconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: darkBlue,
-    marginLeft: 8,
-  },
-  sectionDescription: {
-    fontSize: 14,
-    color: darkBlue,
-    opacity: 0.7,
-    marginBottom: 16,
-  },
-  medicationsList: {
-    marginBottom: 24,
-  },
-  allergiesList: {
-    marginBottom: 24,
-  },
-  allergyItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: primaryBlue,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  checkboxChecked: {
-    backgroundColor: primaryBlue,
-  },
-  allergyName: {
-    fontSize: 16,
-    color: darkBlue,
-  },
-  button: {
-    borderRadius: 25,
-    paddingVertical: 15,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-}); 
+} 

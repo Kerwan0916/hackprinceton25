@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Platform, View, ScrollView, Pressable, Text } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -13,9 +13,13 @@ import { Colors, primaryBlue, primaryTeal, white } from '@/constants/Colors';
 import { hoverGestureHandlerProps } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/hoverGesture';
 import { LinearGradient } from 'expo-linear-gradient';
 
+// Import user data with medications
+import userData from '@/app/data/userData.json';
+
 function Calendar(){
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  
   const [events, setEvents] = useState<Array<{date: string; title: string; time: string}>>([
     { date: new Date().toISOString().split('T')[0], title: 'Take Medication', time: '8:00 AM' },
     { date: new Date().toISOString().split('T')[0], title: 'Take Medication', time: '12:00 PM' },
@@ -23,7 +27,39 @@ function Calendar(){
     { date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0], title: 'Lab Test', time: '7:00 PM' },
     { date: new Date().toISOString().split('T')[0], title: 'Take Medication', time: '10:00 PM' },
   ]);
+
   const { isDayCompleted } = useMedication();
+
+  // Generate medication events for the selected date
+  useEffect(() => {
+    generateMedicationEvents();
+  }, [selectedDate]);
+
+  const generateMedicationEvents = () => {
+    const dateString = selectedDate.toISOString().split('T')[0];
+    let newEvents: Array<{date: string; title: string; time: string}> = [];
+    
+    // Process each medication and its scheduled times
+    userData.medications.forEach(medication => {
+      const { name, timeIds, times } = medication;
+      
+      // Add an event for each time the medication needs to be taken
+      Object.entries(times).forEach(([timeId, timeValue]) => {
+        newEvents.push({
+          date: dateString,
+          title: `Take ${name}`,
+          time: timeValue
+        });
+      });
+    });
+    
+    // Sort events by time
+    newEvents.sort((a, b) => {
+      return new Date('1970/01/01 ' + a.time).getTime() - new Date('1970/01/01 ' + b.time).getTime();
+    });
+    
+    setEvents(newEvents);
+  };
 
   const addEvent = (title: string, date: Date, time: string) => {
     const dateString = date.toISOString().split('T')[0];
@@ -66,7 +102,9 @@ function Calendar(){
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), i);
       const dateString = date.toISOString().split('T')[0];
-      const hasEvents = events.some(event => event.date === dateString);
+      
+      // Every day has medication events
+      const hasEvents = true; 
       const completed = isDayCompleted(date);
       
       days.push(
@@ -130,7 +168,7 @@ function Calendar(){
       </Pressable>
 
       <View style={styles.eventsContainer}>
-        <Text style={styles.eventsTitle}>Events</Text>
+        <Text style={styles.eventsTitle}>Medications for {selectedDate.toLocaleDateString()}</Text>
         {events.map((event, index) => (
           <View key={index} style={styles.eventItem}>
             <View style={styles.eventTimeContainer}>
@@ -138,6 +176,16 @@ function Calendar(){
               <Text style={styles.eventTime}>{event.time}</Text>
             </View>
             <Text style={styles.eventTitle}>{event.title}</Text>
+            {userData.medications.map(med => {
+              if (event.title === `Take ${med.name}`) {
+                return (
+                  <Text key={med.id} style={styles.eventDosage}>
+                    Dosage: {med.dosage} - {med.schedule}
+                  </Text>
+                );
+              }
+              return null;
+            })}
           </View>
         ))}
       </View>
@@ -365,5 +413,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  eventDosage: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 5,
+    fontStyle: 'italic',
   },
 });
