@@ -68,6 +68,7 @@ function Calendar(){
       const completed = isDayCompleted(date);
       
       days.push(
+      
         <Pressable 
           key={i}
           onPress={() => selectDate(date)}
@@ -91,6 +92,7 @@ function Calendar(){
   };
 
   return (
+    <ScrollView style={styles.content}>
     <View style={styles.calendarContainer}>
       <View style={styles.monthSelector}>
         <Pressable onPress={() => setSelectedDate(new Date(selectedDate.setMonth(selectedDate.getMonth() - 1)))}>
@@ -138,6 +140,7 @@ function Calendar(){
         ))}
       </View>
     </View>
+    </ScrollView>
   );
 }
 
@@ -170,6 +173,10 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
     backgroundColor: '#2473B3',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
   },
   welcomeText: {
     fontSize: 26,
