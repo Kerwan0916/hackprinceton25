@@ -2,6 +2,7 @@
   "expo": {
     "name": "Syndra",
     "slug": "syndra",
+    "owner": "kerwan0916",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -11,7 +12,8 @@
     "backgroundColor": "#F8F9FA",
     "primaryColor": "#4A90E2",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kerwan0916.syndra"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +23,8 @@
       "statusBar": {
         "backgroundColor": "#4A90E2",
         "barStyle": "light-content"
-      }
+      },
+      "package": "com.kerwan0916.syndra"
     },
     "web": {
       "bundler": "metro",
@@ -42,6 +45,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "38c08bc7-3e44-47ea-b279-d0ab9fdb3869"
+      }
     }
   }
 }

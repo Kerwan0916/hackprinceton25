@@ -31,9 +31,17 @@ export default function HomeScreen() {
         <View style={styles.avatarContainer}>
           <Ionicons name="person" size={40} color={primaryBlue} />
         </View>
-      </LinearGradient>
+      </LinearGradient >
+      
       
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+      <LinearGradient
+
+        colors={[lightBlue, lightBlue] as const}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.gradientCard}
+      >
         <Pressable style={styles.card}>
           <LinearGradient
             colors={[primaryTeal, primaryBlue] as const}
@@ -45,21 +53,7 @@ export default function HomeScreen() {
           </LinearGradient>
           <Text style={styles.cardTitle}>Daily Check-in</Text>
         </Pressable>
-        
-        <Pressable style={styles.card} onPress={() => router.push('/schedule' as any)}>
-          <LinearGradient
-            colors={[primaryBlue, primaryTeal] as const}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.iconContainer}
-          >
-            <FontAwesome5 name="prescription-bottle-alt" size={24} color="white" />
-          </LinearGradient>
-          <View style={styles.medicationContent}>
-            <Text style={styles.cardTitle}>Medications & Schedule</Text>
-            <Text style={styles.reminderText}>Next reminder at 2:00 PM</Text>
-          </View>
-        </Pressable>
+        </LinearGradient>
         
         <LinearGradient
 
