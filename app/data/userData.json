@@ -1,0 +1,108 @@
+{
+  "name": "Sarah Johnson",
+  "medicalHistory": "47-year-old female with history of hypertension and type 2 diabetes diagnosed in 2018. Underwent appendectomy in 2010. Family history of cardiovascular disease. Non-smoker.",
+  "medications": [
+    {
+      "id": "1",
+      "name": "Ibuprofen",
+      "dosage": "10mg",
+      "schedule": "Take once daily in the morning",
+      "checked": true,
+      "timeIds": ["morning"],
+      "times": {
+        "morning": "2023-05-01T08:00:00.000Z"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Oxycodone",
+      "dosage": "500mg",
+      "schedule": "Take twice daily with meals",
+      "checked": true,
+      "timeIds": ["morning", "evening"],
+      "times": {
+        "morning": "2023-05-01T08:00:00.000Z",
+        "evening": "2023-05-01T18:00:00.000Z"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Atorvastatin",
+      "dosage": "20mg",
+      "schedule": "Take once daily at bedtime",
+      "checked": true,
+      "timeIds": ["bedtime"],
+      "times": {
+        "bedtime": "2023-05-01T22:00:00.000Z"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Levothyroxine",
+      "dosage": "50mcg",
+      "schedule": "Take once daily on an empty stomach",
+      "checked": true,
+      "timeIds": ["morning"],
+      "times": {
+        "morning": "2023-05-01T08:00:00.000Z"
+      }
+    }
+  ],
+  "allergies": [
+    { "id": "1", "name": "Penicillin", "checked": true },
+    { "id": "2", "name": "Sulfa Drugs", "checked": true },
+    { "id": "3", "name": "Aspirin", "checked": true }
+  ],
+  "timeOptions": [
+    { 
+      "id": "morning", 
+      "label": "Morning", 
+      "icon": "weather-sunny", 
+      "displayText": "Take in the morning", 
+      "startHour": 5, 
+      "endHour": 10,
+      "defaultHour": 8,
+      "defaultMinute": 0
+    },
+    { 
+      "id": "afternoon", 
+      "label": "Afternoon", 
+      "icon": "weather-partly-cloudy", 
+      "displayText": "Take in the afternoon",
+      "startHour": 11, 
+      "endHour": 16,
+      "defaultHour": 13,
+      "defaultMinute": 0
+    },
+    { 
+      "id": "evening", 
+      "label": "Evening", 
+      "icon": "weather-sunset", 
+      "displayText": "Take in the evening",
+      "startHour": 17, 
+      "endHour": 20,
+      "defaultHour": 18,
+      "defaultMinute": 0
+    },
+    { 
+      "id": "bedtime", 
+      "label": "Bedtime", 
+      "icon": "bed", 
+      "displayText": "Take at bedtime",
+      "startHour": 21, 
+      "endHour": 23,
+      "defaultHour": 22,
+      "defaultMinute": 0
+    },
+    { 
+      "id": "custom", 
+      "label": "Custom Schedule", 
+      "icon": "clock-outline", 
+      "displayText": "Custom schedule",
+      "startHour": 0,
+      "endHour": 23,
+      "defaultHour": 12,
+      "defaultMinute": 0
+    }
+  ]
+} 
