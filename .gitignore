@@ -36,3 +36,12 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# API Keys
+constants/api.ts
+
+# android
+android/
+
+*.env*
+.env
