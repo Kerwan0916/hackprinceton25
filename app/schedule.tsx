@@ -5,65 +5,104 @@ import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { Colors, primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
 import { router } from 'expo-router';
 import { useMedication } from '@/app/context/MedicationContext';
+import userData from '@/app/data/userData.json';
 
-// Mock data - this would come from your medication database
-const mockMedications = [
-  {
-    id: '1',
-    name: 'Lisinopril',
-    dosage: '10mg',
-    time: '9:00 AM',
-    checked: false,
-  },
-  {
-    id: '2',
-    name: 'Metformin',
-    dosage: '500mg',
-    time: '12:00 PM',
-    checked: false,
-  },
-  {
-    id: '3',
-    name: 'Atorvastatin',
-    dosage: '20mg',
-    time: '8:00 PM',
-    checked: false,
-  },
-];
+// Define types for our medication data
+interface FlattenedMedication {
+  id: string;
+  name: string;
+  dosage: string;
+  time: string;
+  checked: boolean;
+  originalId: string;
+}
+
+// Function to flatten medications with multiple times into separate entries
+const flattenMedications = (): FlattenedMedication[] => {
+  const flattened: FlattenedMedication[] = [];
+  
+  // Using any type to avoid TS errors with the complex JSON structure
+  (userData.medications as any[]).forEach((med) => {
+    // If medication has multiple time entries, create an entry for each time
+    if (med.timeIds && med.timeIds.length > 0) {
+      med.timeIds.forEach((timeId: string) => {
+        if (med.times && med.times[timeId]) {
+          flattened.push({
+            id: `${med.id}-${timeId}`,
+            name: med.name,
+            dosage: med.dosage,
+            time: med.times[timeId],
+            checked: false,
+            originalId: med.id
+          });
+        }
+      });
+    } else {
+      // Fallback for medications without specific times
+      flattened.push({
+        id: med.id,
+        name: med.name,
+        dosage: med.dosage,
+        time: 'Time not specified',
+        checked: false,
+        originalId: med.id
+      });
+    }
+  });
+  
+  // Sort by time
+  return flattened.sort((a, b) => {
+    const timeA = new Date('1970/01/01 ' + a.time).getTime();
+    const timeB = new Date('1970/01/01 ' + b.time).getTime();
+    return timeA - timeB;
+  });
+};
 
 export default function ScheduleScreen() {
-  const [medications, setMedications] = useState(mockMedications);
+  const [medications, setMedications] = useState<FlattenedMedication[]>(flattenMedications());
   const [allCompleted, setAllCompleted] = useState(false);
   const { markDayAsCompleted, isDayCompleted, removeCompletedDay } = useMedication();
 
   // Check initial completion status
   useEffect(() => {
     const today = new Date();
-    if (isDayCompleted(today)) {
-      setMedications(medications.map(med => ({ ...med, checked: true })));
+    const isCompleted = isDayCompleted(today);
+    
+    // Only update state if needed - run this only on initial mount
+    if (isCompleted) {
+      setMedications(prev => prev.map(med => ({ ...med, checked: true })));
       setAllCompleted(true);
+    } else {
+      // Only set if not already in correct state - run this only on initial mount
+      setMedications(prev => prev.map(med => ({ ...med, checked: false })));
+      setAllCompleted(false);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on component mount, not on every render or when isDayCompleted changes
 
   const toggleMedication = (id: string) => {
-    const newMedications = medications.map(med => 
-      med.id === id ? { ...med, checked: !med.checked } : med
-    );
-    setMedications(newMedications);
-
-    // Check if all medications are completed
-    const allChecked = newMedications.every(med => med.checked);
-    setAllCompleted(allChecked);
-
-    const today = new Date();
-    if (allChecked) {
-      // Mark today as completed in the calendar
-      markDayAsCompleted(today);
-      alert('Great job! You\'ve completed all your medications for today!');
-    } else {
-      // If any medication is unchecked, remove the day from completed days
-      removeCompletedDay(today);
-    }
+    // Update the flattened medication list with function form to ensure it uses the latest state
+    setMedications(prevMedications => {
+      const newMedications = prevMedications.map(med => 
+        med.id === id ? { ...med, checked: !med.checked } : med
+      );
+      
+      // Check if all medications are completed
+      const allChecked = newMedications.every(med => med.checked);
+      setAllCompleted(allChecked);
+      
+      const today = new Date();
+      if (allChecked) {
+        // Mark today as completed in the calendar
+        markDayAsCompleted(today);
+        alert('Great job! You\'ve completed all your medications for today!');
+      } else {
+        // If any medication is unchecked, remove the day from completed days
+        removeCompletedDay(today);
+      }
+      
+      return newMedications;
+    });
   };
 
   return (
@@ -74,7 +113,7 @@ export default function ScheduleScreen() {
         end={{ x: 1, y: 0 }}
         style={styles.header}
       >
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
+        <Pressable onPress={() => router.push('/(tabs)')} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color={white} />
         </Pressable>
         <Text style={styles.title}>Today's Medications</Text>

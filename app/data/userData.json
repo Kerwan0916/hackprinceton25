@@ -10,7 +10,7 @@
       "checked": true,
       "timeIds": ["morning"],
       "times": {
-        "morning": "2023-05-01T08:00:00.000Z"
+        "morning": "9:00 AM"
       }
     },
     {
@@ -21,8 +21,8 @@
       "checked": true,
       "timeIds": ["morning", "evening"],
       "times": {
-        "morning": "2023-05-01T08:00:00.000Z",
-        "evening": "2023-05-01T18:00:00.000Z"
+        "morning": "9:00 AM",
+        "evening": "6:00 PM"
       }
     },
     {
@@ -33,7 +33,7 @@
       "checked": true,
       "timeIds": ["bedtime"],
       "times": {
-        "bedtime": "2023-05-01T22:00:00.000Z"
+        "bedtime": "10:00 PM"
       }
     },
     {
@@ -44,7 +44,7 @@
       "checked": true,
       "timeIds": ["morning"],
       "times": {
-        "morning": "2023-05-01T08:00:00.000Z"
+        "morning": "9:00 AM"
       }
     }
   ],
