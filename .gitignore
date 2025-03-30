@@ -35,6 +35,9 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# google api key
+./constants/api.ts
+
 app-example
 
 # API Keys

@@ -17,7 +17,6 @@ export default function OnboardingLayout() {
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: 'transparent' },
-          cardStyle: { backgroundColor: 'transparent' },
           animation: 'slide_from_right',
         }}
       >

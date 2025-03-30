@@ -860,9 +860,9 @@ const styles = StyleSheet.create({
    },
   sendButton: {
     backgroundColor: '#2473B3',
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
      shadowColor: '#000',
@@ -893,4 +893,4 @@ const styles = StyleSheet.create({
   typingDotMiddle: {
     opacity: 0.5,
   },
-}); 
+});

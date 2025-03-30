@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { router } from 'expo-router';
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import MedicationItem from '../../components/onboarding/MedicationItem';
 import { LinearGradient } from 'expo-linear-gradient';
 import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
@@ -67,7 +67,7 @@ export default function MedicationsScreen() {
 
   return (
     <LinearGradient
-      colors={[primaryBlue, white]}
+      colors={[primaryBlue, primaryTeal]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={{ flex: 1 }}

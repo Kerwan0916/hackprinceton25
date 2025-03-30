@@ -35,7 +35,7 @@ function AIAgentButton() {
 
 // Tab layout with blue and teal theme
 export default function TabLayout() {
-  const colorScheme = useColorScheme() || 'light';
+  const colorScheme = (useColorScheme() || 'light') as 'light' | 'dark';
   const theme = Colors[colorScheme];
   
   return (
@@ -56,11 +56,25 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="calendar"
+        options={{
+          title: 'Calendar',
+          tabBarIcon: ({ color }) => <Ionicons name="calendar" size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="ai-agent"
         options={{
           title: 'AI Agent',
           tabBarButton: () => <AIAgentButton />,
         }}
+      />
+      <Tabs.Screen
+       name="snap"
+       options={{
+        title: 'Snap',
+        tabBarIcon: ({ color }) => <Ionicons name="camera-outline" size={24} color={color} />,
+       }}
       />
       <Tabs.Screen
         name="settings"
@@ -69,6 +83,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Ionicons name="settings-outline" size={24} color={color} />,
         }}
       />
+      
     </Tabs>
   );
 }
