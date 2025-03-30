@@ -6,16 +6,11 @@ import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { GoogleGenAI } from "@google/genai";
 
-// Import API key or use a placeholder
-let GOOGLE_API_KEY = "";
-try {
-  GOOGLE_API_KEY = require('@/constants/api').GOOGLE_API_KEY;
-} catch (error) {
-  console.warn("API key not found, using empty string");
-}
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+// import { GoogleGenAI } from "@google/genai";
+// import { GOOGLE_API_KEY } from '@/constants/api'; // find a way to hide the API key 
+// NOTE: AI feature is temporarily disabled to fix browser API key error
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -33,7 +28,6 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [loaded, setLoaded] = useState(false);
   const colorScheme = useColorScheme();
-  const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY });
 
   useEffect(() => {
     // Simulate resource loading
