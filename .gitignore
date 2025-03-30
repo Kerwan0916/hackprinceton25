@@ -45,3 +45,5 @@ constants/api.ts
 
 # android
 android/
+
+.env
