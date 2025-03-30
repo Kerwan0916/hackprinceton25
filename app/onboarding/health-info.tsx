@@ -6,16 +6,27 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
 
 export default function HealthInfoScreen() {
-  const [provider, setProvider] = useState('');
-  const [importing, setImporting] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loggingIn, setLoggingIn] = useState(false);
 
   const handleSignIn = () => {
-    setImporting(true);
-    // Simulate importing data
+    setLoggingIn(true);
+    // Simulate login process
     setTimeout(() => {
-      setImporting(false);
+      setLoggingIn(false);
       router.push('/onboarding/medications' as any);
-    }, 2000);
+    }, 1000);
+  };
+
+  const handleForgotPassword = () => {
+    // Placeholder function
+    alert('Forgot Password functionality would go here');
+  };
+
+  const handleCreateAccount = () => {
+    // Placeholder function
+    alert('Create Account functionality would go here');
   };
 
   return (
@@ -45,68 +56,45 @@ export default function HealthInfoScreen() {
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
           >
-            <FontAwesome5 name="hospital-user" size={50} color={primaryBlue} />
+            <FontAwesome5 name="user-circle" size={50} color={primaryBlue} />
           </LinearGradient>
           
           <Text style={styles.subtitle}>
-            Sign in with your medical provider
+            Sign in to your account
           </Text>
           
           <Text style={styles.description}>
-            We'll securely import your medical history, medications, and allergies
+            Enter your login details to access all features
           </Text>
           
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Healthcare Provider</Text>
+            <Text style={styles.label}>Username</Text>
             <TextInput
               style={styles.input}
-              placeholder="Search for your provider"
-              value={provider}
-              onChangeText={setProvider}
+              placeholder="Enter your username"
+              value={username}
+              onChangeText={setUsername}
             />
           </View>
 
-          <View style={styles.providerOptions}>
-            <Pressable style={styles.providerOption}>
-              <LinearGradient
-                colors={[primaryBlue, primaryTeal] as const}
-                style={styles.providerIconContainer}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <FontAwesome5 name="hospital" size={20} color={white} />
-              </LinearGradient>
-              <Text style={styles.providerName}>Hospital Network</Text>
-            </Pressable>
-            
-            <Pressable style={styles.providerOption}>
-              <LinearGradient
-                colors={[primaryTeal, primaryBlue] as const}
-                style={styles.providerIconContainer}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <FontAwesome5 name="clinic-medical" size={20} color={white} />
-              </LinearGradient>
-              <Text style={styles.providerName}>Family Clinic</Text>
-            </Pressable>
-            
-            <Pressable style={styles.providerOption}>
-              <LinearGradient
-                colors={[primaryBlue, primaryTeal] as const}
-                style={styles.providerIconContainer}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <FontAwesome5 name="user-md" size={20} color={white} />
-              </LinearGradient>
-              <Text style={styles.providerName}>Private Practice</Text>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+            <Pressable onPress={handleForgotPassword} style={styles.forgotPasswordContainer}>
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </Pressable>
           </View>
 
           <Pressable 
             onPress={handleSignIn}
-            disabled={importing}
+            disabled={loggingIn}
+            style={{width: '100%', marginTop: 16}}
           >
             <LinearGradient
               colors={[primaryBlue, primaryTeal] as const}
@@ -115,13 +103,18 @@ export default function HealthInfoScreen() {
               end={{ x: 1, y: 0 }}
             >
               <Text style={styles.buttonText}>
-                {importing ? 'Importing...' : 'Sign In & Import'}
+                {loggingIn ? 'Signing in...' : 'Sign In'}
               </Text>
             </LinearGradient>
           </Pressable>
           
-          <Pressable onPress={() => router.push('/onboarding/medications' as any)}>
-            <Text style={styles.skipText}>Skip for now</Text>
+          <Pressable 
+            onPress={handleCreateAccount}
+            style={{width: '100%'}}
+          >
+            <View style={styles.createAccountButton}>
+              <Text style={styles.createAccountText}>Create Account</Text>
+            </View>
           </Pressable>
         </View>
       </ScrollView>
@@ -202,31 +195,13 @@ const styles = StyleSheet.create({
     borderColor: lightBlue,
     fontSize: 16,
   },
-  providerOptions: {
-    width: '100%',
-    marginBottom: 24,
+  forgotPasswordContainer: {
+    alignSelf: 'flex-end',
+    marginTop: 8,
   },
-  providerOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8,
-    backgroundColor: '#F5F7FA',
-    borderWidth: 1,
-    borderColor: lightBlue,
-  },
-  providerIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  providerName: {
-    fontSize: 16,
-    color: darkBlue,
+  forgotPasswordText: {
+    color: primaryBlue,
+    fontSize: 14,
   },
   button: {
     borderRadius: 25,
@@ -237,6 +212,20 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  createAccountButton: {
+    borderRadius: 25,
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: primaryBlue,
+  },
+  createAccountText: {
+    color: primaryBlue,
     fontSize: 16,
     fontWeight: '600',
   },

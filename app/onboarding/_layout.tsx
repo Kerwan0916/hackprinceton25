@@ -22,7 +22,6 @@ export default function OnboardingLayout() {
       >
         <Stack.Screen name="health-info" />
         <Stack.Screen name="medications" />
-        <Stack.Screen name="reminders" />
       </Stack>
     </LinearGradient>
   );
