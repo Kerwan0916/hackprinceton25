@@ -1,4 +1,6 @@
 {
+  "name": "Sarah Johnson",
+  "medicalHistory": "47-year-old female with history of hypertension and type 2 diabetes diagnosed in 2018. Underwent appendectomy in 2010. Family history of cardiovascular disease. Non-smoker.",
   "medications": [
     {
       "id": "1",
