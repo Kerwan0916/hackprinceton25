@@ -5,10 +5,13 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useMedication } from '@/app/context/MedicationContext';
+import { router } from 'expo-router';
 
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import { Colors } from '../../constants/Colors';
+import { Colors, primaryBlue, primaryTeal, white } from '@/constants/Colors';
 import { hoverGestureHandlerProps } from 'react-native-gesture-handler/lib/typescript/handlers/gestures/hoverGesture';
+import { LinearGradient } from 'expo-linear-gradient';
 
 function Calendar(){
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -18,6 +21,7 @@ function Calendar(){
     { date: new Date().toISOString().split('T')[0], title: 'Doctor Appointment', time: '2:30 PM' },
     { date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0], title: 'Lab Test', time: '10:00 AM' },
   ]);
+  const { isDayCompleted } = useMedication();
 
   const addEvent = (title: string, date: Date, time: string) => {
     const dateString = date.toISOString().split('T')[0];
@@ -61,6 +65,7 @@ function Calendar(){
       const date = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), i);
       const dateString = date.toISOString().split('T')[0];
       const hasEvents = events.some(event => event.date === dateString);
+      const completed = isDayCompleted(date);
       
       days.push(
         <Pressable 
@@ -69,11 +74,13 @@ function Calendar(){
           style={({hovered}) => [
             styles.calendarDay,
             date.getDate() === selectedDate.getDate() && styles.selectedDay,
+            completed && styles.completedDay,
             hovered && styles.hoveredDay
           ]}>
           <Text style={[
             styles.calendarDayText,
-            date.getDate() === selectedDate.getDate() && styles.selectedDayText
+            date.getDate() === selectedDate.getDate() && styles.selectedDayText,
+            completed && styles.completedDayText
           ]}>{i}</Text>
           {hasEvents && <View style={styles.eventDot} />}
         </Pressable>
@@ -99,6 +106,24 @@ function Calendar(){
 
       {renderCalendarHeader()}
       {renderCalendarDays()}
+
+      <Pressable 
+        style={({ hovered }) => [
+          styles.scheduleButton,
+          hovered && styles.scheduleButtonHovered
+        ]}
+        onPress={() => router.push('/schedule' as any)}
+      >
+        <LinearGradient
+          colors={[primaryBlue, primaryTeal] as const}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.scheduleButtonGradient}
+        >
+          <Ionicons name="calendar-outline" size={20} color={white} />
+          <Text style={styles.scheduleButtonText}>See Daily Schedule</Text>
+        </LinearGradient>
+      </Pressable>
 
       <View style={styles.eventsContainer}>
         <Text style={styles.eventsTitle}>Events</Text>
@@ -302,5 +327,34 @@ const styles = StyleSheet.create({
   eventTitle: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  completedDay: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 20,
+  },
+  completedDayText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  scheduleButton: {
+    marginVertical: 20,
+    borderRadius: 25,
+    overflow: 'hidden',
+  },
+  scheduleButtonHovered: {
+    opacity: 0.9,
+  },
+  scheduleButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  scheduleButtonText: {
+    color: white,
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
 });

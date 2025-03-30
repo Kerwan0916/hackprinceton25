@@ -8,9 +8,17 @@ import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-// import { GoogleGenAI } from "@google/genai";
-// import { GOOGLE_API_KEY } from '@/constants/api'; // find a way to hide the API key 
-// NOTE: AI feature is temporarily disabled to fix browser API key error
+
+import { GoogleGenAI } from "@google/genai";
+import { MedicationProvider } from './context/MedicationContext';
+
+// Import API key or use a placeholder
+let GOOGLE_API_KEY = "";
+try {
+  GOOGLE_API_KEY = require('@/constants/api').GOOGLE_API_KEY;
+} catch (error) {
+  console.warn("API key not found, using empty string");
+}
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -43,12 +51,14 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" redirect={true} options={{ headerShown: false }} />
-        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
+      <MedicationProvider>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" redirect={true} options={{ headerShown: false }} />
+          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </MedicationProvider>
     </SafeAreaProvider>
   );
 }

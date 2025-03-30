@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { Colors, primaryBlue, primaryTeal, darkBlue, lightBlue, white, offWhite } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-
+import { router } from 'expo-router';
 export default function HomeScreen() {
   const userName = "Name"; // This would come from user profile in a real app
   const colorScheme = useColorScheme() || 'light';
@@ -45,7 +45,7 @@ export default function HomeScreen() {
           <Text style={styles.cardTitle}>Daily Check-in</Text>
         </Pressable>
         
-        <Pressable style={styles.card}>
+        <Pressable style={styles.card} onPress={() => router.push('/schedule' as any)}>
           <LinearGradient
             colors={[primaryBlue, primaryTeal] as const}
             start={{ x: 0, y: 0 }}
